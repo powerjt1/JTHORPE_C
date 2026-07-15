@@ -433,6 +433,23 @@ section[id] { scroll-margin-top: 86px; }
 }
 .arch-benefits strong { color: var(--text); display: block; margin-bottom: 2px; }
 
+/* ---- Team page ---- */
+.team-group {
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+  margin: 40px 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.team-group:first-of-type { margin-top: 8px; }
+.team-grid { margin-bottom: 8px; }
+#team-hero { padding-bottom: 24px; }
+#team-hero h1 {
+  font-size: clamp(2rem, 4.6vw, 3rem);
+  letter-spacing: -0.03em;
+  margin: 0 0 16px;
+}
+
 /* ---- Steps ---- */
 .steps {
   list-style: none;
