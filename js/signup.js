@@ -100,8 +100,10 @@
       // TODO: POST to your trial-provisioning endpoint (JABB backend / service).
       // eslint-disable-next-line no-console
       console.log("Trial sign-up (demo):", { email: email });
-      showNote("Thanks! Check " + email + " to confirm and start your trial.", "success");
-      form.reset();
+      // Hand the email to the welcome screen without putting PII in the URL.
+      try { sessionStorage.setItem("lucy_trial_email", email); } catch (err) {}
+      showNote("Thanks! Taking you to the next step…", "success");
+      window.location.assign("welcome.html");
     });
   }
 
