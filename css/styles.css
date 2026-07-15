@@ -450,6 +450,97 @@ section[id] { scroll-margin-top: 86px; }
   margin: 0 0 16px;
 }
 
+/* ---- Sign-up page ---- */
+.nav-back { color: var(--muted); font-weight: 500; font-size: 0.95rem; }
+.nav-back:hover { color: var(--text); }
+
+.signup { padding: 48px 0 64px; }
+.signup-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+  min-height: 60vh;
+}
+.signup-value h1 {
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin: 12px 0 14px;
+}
+.signup-value .lede { margin-bottom: 20px; }
+.signup-trust {
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  box-shadow: var(--shadow);
+  max-width: 440px;
+  margin-inline: auto;
+  width: 100%;
+}
+.auth-card h2 { margin: 0 0 4px; font-size: 1.4rem; }
+.auth-sub { color: var(--muted); margin: 0 0 22px; font-size: 0.95rem; }
+
+.sso-buttons { display: grid; gap: 12px; }
+.sso-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 18px;
+  background: #ffffff;
+  color: #1f2233;
+  border: 1px solid #d7dbe8;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.sso-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -14px rgba(0,0,0,0.8); background: #f6f8fc; }
+.sso-btn:active { transform: translateY(0); }
+.sso-logo { display: inline-flex; }
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.auth-form .field { margin-bottom: 14px; }
+.auth-legal {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.auth-legal a { color: var(--brand-2); }
+.auth-legal a:hover { text-decoration: underline; }
+
+@media (max-width: 860px) {
+  .signup-grid { grid-template-columns: 1fr; gap: 36px; min-height: 0; }
+  .signup-value { order: -1; }
+}
+
 /* ---- Steps ---- */
 .steps {
   list-style: none;
