@@ -53,6 +53,17 @@ Because it's fully static, it works on any static host:
   Replace the marked block with a POST to your form handler (a JABB Networks
   backend, Formspree, Netlify Forms, etc.) to start collecting real leads.
 
+## Internal docs
+
+Lucy AI is a persona-driven, multi-agent system. Internal architecture and the
+per-agent specs live under [`docs/agents/`](docs/agents/) (system-of-record —
+**not** published on the public site). Start with the
+[agent registry](docs/agents/README.md).
+
+> Keep real secrets out of the repo. `.env`, key files, and local settings are
+> git-ignored; store live credentials in a secrets manager (e.g. Azure Key Vault)
+> and reference them by name only.
+
 ## License
 
 See [LICENSE](LICENSE).

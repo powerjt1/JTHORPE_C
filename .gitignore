@@ -1,3 +1,20 @@
+# ---- Secrets & environment (never commit real credentials) ----
+.env
+.env.*
+!.env.example
+*.local
+secrets.json
+local.settings.json
+*.pem
+*.key
+*.pfx
+
+# ---- OS / editor cruft ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
 # Prerequisites
 *.d
 
