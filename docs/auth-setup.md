@@ -94,3 +94,14 @@ The backend sends the welcome email automatically after a new sign-in
 `/email/resend` for the welcome page's "Resend email" button. When the site is
 served from a different origin than the backend, set `ALLOWED_ORIGIN` so those
 `fetch` calls are permitted. See [`../backend/README.md`](../backend/README.md).
+
+### Email verification (confirm link)
+
+Email-fallback sign-ups get a **signed, expiring confirm link** in their welcome
+email (`GET /auth/verify?token=…`). The token is an HMAC-signed, self-validating
+value (no DB) whose lifetime is `VERIFY_TTL_MINUTES` (default 24h) and whose
+signing key is `TOKEN_SECRET` (defaults to `COOKIE_SECRET`). Clicking it marks
+the account verified and redirects to `VERIFIED_URL` (or `WELCOME_URL`) with
+`?verified=1`, which the welcome page renders as "Email confirmed!". Expired or
+tampered links redirect back to the sign-up page with an error. SSO sign-ins are
+already provider-verified, so they don't receive a confirm link.

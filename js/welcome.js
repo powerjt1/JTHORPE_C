@@ -9,8 +9,23 @@
   var email = "";
   try { email = sessionStorage.getItem("lucy_trial_email") || ""; } catch (e) {}
 
+  var verified = false;
+  try { verified = new URLSearchParams(window.location.search).get("verified") === "1"; } catch (e) {}
+
+  var heading = document.querySelector(".welcome-card h1");
   var lede = document.getElementById("welcomeLede");
-  if (lede && email) {
+  var icon = document.querySelector(".welcome-icon");
+
+  if (verified) {
+    // Arrived from the confirm link — email is now verified.
+    if (icon) icon.textContent = "🎉";
+    if (heading) heading.textContent = "Email confirmed!";
+    if (lede) {
+      lede.innerHTML = "Your email is verified" + (email ? " (<strong>" +
+        email.replace(/[<>&]/g, "") + "</strong>)" : "") +
+        ". Connect your account to finish setting up your trial.";
+    }
+  } else if (lede && email) {
     lede.innerHTML =
       "We've sent a confirmation link to <strong>" +
       email.replace(/[<>&]/g, "") +

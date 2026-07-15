@@ -17,7 +17,9 @@ function keyFor(profile) {
 
 /**
  * Find an existing trial account for this profile or create one.
- * @returns {{ id, email, name, provider, isNew, trialStartedAt }}
+ * SSO sign-ins (provider !== "email") arrive with a provider-verified email,
+ * so they're marked verified on creation; email-fallback sign-ups are not.
+ * @returns {{ id, email, name, provider, emailVerified, isNew, trialStartedAt }}
  */
 function findOrCreateTrialAccount(profile) {
   var key = keyFor(profile);
@@ -30,11 +32,41 @@ function findOrCreateTrialAccount(profile) {
     email: profile.email,
     name: profile.name,
     provider: profile.provider,
+    emailVerified: profile.provider !== "email",
     trialStartedAt: new Date().toISOString()
   };
   byKey.set(key, account);
-  // TODO: persist to your database; kick off trial provisioning + welcome email.
+  // TODO: persist to your database; kick off trial provisioning.
   return Object.assign({}, account, { isNew: true });
 }
 
-module.exports = { findOrCreateTrialAccount: findOrCreateTrialAccount };
+/** Return a copy of the first account matching this email, or null. */
+function getByEmail(emailAddr) {
+  var target = String(emailAddr || "").toLowerCase();
+  for (var acc of byKey.values()) {
+    if (acc.email && acc.email.toLowerCase() === target) {
+      return Object.assign({}, acc);
+    }
+  }
+  return null;
+}
+
+/** Mark every account with this email as verified. Returns the count updated. */
+function markVerifiedByEmail(emailAddr) {
+  var target = String(emailAddr || "").toLowerCase();
+  var n = 0;
+  for (var acc of byKey.values()) {
+    if (acc.email && acc.email.toLowerCase() === target && !acc.emailVerified) {
+      acc.emailVerified = true;
+      acc.verifiedAt = new Date().toISOString();
+      n++;
+    }
+  }
+  return n;
+}
+
+module.exports = {
+  findOrCreateTrialAccount: findOrCreateTrialAccount,
+  getByEmail: getByEmail,
+  markVerifiedByEmail: markVerifiedByEmail
+};

@@ -16,6 +16,7 @@ var isProviderConfigured = cfg.isProviderConfigured;
 var oauth = require("../src/oauth");
 var accounts = require("../src/accounts");
 var email = require("../src/email");
+var tokens = require("../src/tokens");
 
 var TX_COOKIE = "lucy_oauth_tx"; // short-lived transaction (state + PKCE + provider)
 var SESSION_COOKIE = "lucy_session";
@@ -144,6 +145,34 @@ router.get("/callback", async function (req, res) {
     console.error("[auth/callback]", err && err.message ? err.message : err);
     return redirectWithError(res, "Sign-in failed. Please try again.");
   }
+});
+
+// ---- Verify email (from the link in the welcome email) ----
+router.get("/verify", function (req, res) {
+  var token = req.query && req.query.token;
+  if (!token) {
+    return redirectWithError(res, "Missing verification token.");
+  }
+
+  var claims;
+  try {
+    claims = tokens.verify(String(token));
+  } catch (e) {
+    var reason = e && e.message === "expired"
+      ? "Your confirmation link has expired. Request a new one."
+      : "That confirmation link isn't valid.";
+    return redirectWithError(res, reason);
+  }
+
+  if (claims.purpose !== "verify" || !claims.email) {
+    return redirectWithError(res, "That confirmation link isn't valid.");
+  }
+
+  accounts.markVerifiedByEmail(claims.email);
+
+  var dest = (config.verifiedUrl || config.welcomeUrl);
+  dest += (dest.indexOf("?") === -1 ? "?" : "&") + "verified=1";
+  return res.redirect(dest);
 });
 
 // ---- Logout ----

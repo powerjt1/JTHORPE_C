@@ -17,24 +17,39 @@ var cfg = require("./config").config;
 // ---------- message content ----------
 
 function buildWelcomeEmail(opts) {
-  var name = (opts && opts.name) ? String(opts.name).split(" ")[0] : "there";
-  var subject = "Welcome to Lucy AI — confirm your free trial";
+  opts = opts || {};
+  var name = opts.name ? String(opts.name).split(" ")[0] : "there";
+  var verifyUrl = opts.verifyUrl || "";
+  var subject = verifyUrl
+    ? "Confirm your email to start your Lucy AI trial"
+    : "Welcome to Lucy AI — your free trial is ready";
+
+  var confirmBlockHtml = verifyUrl
+    ? '<p style="margin:22px 0">' +
+        '<a href="' + escapeHtml(verifyUrl) + '" ' +
+        'style="display:inline-block;background:#7c5cff;color:#fff;text-decoration:none;' +
+        'font-weight:600;padding:12px 22px;border-radius:8px">Confirm my email</a></p>' +
+        '<p style="color:#5b6178;font-size:12px;word-break:break-all">Or paste this link:<br>' +
+        escapeHtml(verifyUrl) + "</p>"
+    : "";
+
   var html =
     '<div style="font-family:system-ui,Segoe UI,Arial,sans-serif;max-width:520px;margin:auto;color:#1f2233">' +
     '<h1 style="font-size:22px">You\'re in, ' + escapeHtml(name) + '! 🎉</h1>' +
-    "<p>Your 14-day Lucy AI free trial is ready. Here's what happens next:</p>" +
-    "<ol><li>Confirm this email address.</li>" +
-    "<li>Connect your Microsoft or Google account.</li>" +
-    "<li>Tell Lucy what to automate first.</li></ol>" +
+    "<p>Your 14-day Lucy AI free trial is ready." +
+    (verifyUrl ? " First, confirm your email address:" : "") + "</p>" +
+    confirmBlockHtml +
+    "<p>Then you'll connect your Microsoft or Google account and tell Lucy what to automate first.</p>" +
     '<p style="color:#5b6178;font-size:13px">Powered by JABB Networks.</p>' +
     "</div>";
+
   var text =
     "You're in, " + name + "!\n\n" +
     "Your 14-day Lucy AI free trial is ready.\n" +
-    "1. Confirm this email address.\n" +
-    "2. Connect your Microsoft or Google account.\n" +
-    "3. Tell Lucy what to automate first.\n\n" +
+    (verifyUrl ? "Confirm your email: " + verifyUrl + "\n\n" : "") +
+    "Then connect your Microsoft or Google account and tell Lucy what to automate first.\n\n" +
     "Powered by JABB Networks.";
+
   return { subject: subject, html: html, text: text };
 }
 
@@ -147,7 +162,7 @@ async function sendViaGmail(email, to, msg) {
 /** Send the trial welcome email to `to`. Resolves even for "none". */
 async function sendTrialWelcome(to, opts) {
   var email = cfg.email;
-  var msg = buildWelcomeEmail(opts || {});
+  var msg = buildWelcomeEmail(opts || {}); // opts may include { name, verifyUrl }
 
   if (email.provider === "graph") return sendViaGraph(email, to, msg);
   if (email.provider === "gmail") return sendViaGmail(email, to, msg);

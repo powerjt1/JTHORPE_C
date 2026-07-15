@@ -24,6 +24,12 @@ var config = {
   cookieSecure: env("COOKIE_SECURE", "false") === "true",
   allowedOrigin: env("ALLOWED_ORIGIN", ""),
 
+  // Email-verification tokens.
+  tokenSecret: env("TOKEN_SECRET", env("COOKIE_SECRET", "")),
+  verifyTtlMinutes: parseInt(env("VERIFY_TTL_MINUTES", "1440"), 10), // 24h
+  // Where /auth/verify sends users after success (defaults to WELCOME_URL).
+  verifiedUrl: env("VERIFIED_URL", ""),
+
   providers: {
     microsoft: {
       label: "Microsoft",

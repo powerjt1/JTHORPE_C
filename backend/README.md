@@ -31,6 +31,7 @@ from the signed transaction cookie.
 | GET | `/auth/microsoft/start` | Begin Microsoft sign-in |
 | GET | `/auth/google/start` | Begin Google sign-in |
 | GET | `/auth/callback` | OAuth redirect target (both providers); sends welcome email on new trials |
+| GET | `/auth/verify` | Confirm an email from the link in the welcome email (`?token=…`) |
 | POST | `/auth/logout` | Clear the session cookie |
 | POST | `/email/trial` | Email-fallback sign-up: create trial + send welcome |
 | POST | `/email/resend` | Re-send the welcome email to the signed-in user |

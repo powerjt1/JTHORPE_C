@@ -16,6 +16,7 @@ var cfg = require("../src/config");
 var config = cfg.config;
 var accounts = require("../src/accounts");
 var email = require("../src/email");
+var verification = require("../src/verification");
 
 var SESSION_COOKIE = "lucy_session";
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -42,7 +43,11 @@ router.post("/trial", async function (req, res) {
 
   if (account.isNew) {
     try {
-      await email.sendTrialWelcome(account.email, { name: account.name });
+      // Email sign-ups aren't provider-verified — include a confirm link.
+      await email.sendTrialWelcome(account.email, {
+        name: account.name,
+        verifyUrl: verification.makeVerifyUrl(account.email)
+      });
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error("[email/trial] send failed:", e && e.message ? e.message : e);
@@ -71,7 +76,13 @@ router.post("/resend", async function (req, res) {
   }
 
   try {
-    await email.sendTrialWelcome(session.email, { name: session.name });
+    // Re-issue a confirm link only if this account still needs verifying.
+    var acc = accounts.getByEmail(session.email);
+    var opts = { name: session.name };
+    if (!acc || !acc.emailVerified) {
+      opts.verifyUrl = verification.makeVerifyUrl(session.email);
+    }
+    await email.sendTrialWelcome(session.email, opts);
     return res.json({ ok: true, email: session.email });
   } catch (e) {
     // eslint-disable-next-line no-console
