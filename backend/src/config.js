@@ -1,0 +1,60 @@
+"use strict";
+
+/**
+ * Loads configuration from the environment and builds per-provider OAuth config.
+ * No secrets are hard-coded here — everything comes from env (see .env.example).
+ */
+
+function env(name, fallback) {
+  var v = process.env[name];
+  return v === undefined || v === "" ? fallback : v;
+}
+
+var BASE_URL = env("BASE_URL", "http://localhost:8787");
+var REDIRECT_URI = env("REDIRECT_URI", BASE_URL.replace(/\/$/, "") + "/auth/callback");
+var MS_TENANT = env("MS_TENANT", "common");
+
+var config = {
+  port: parseInt(env("PORT", "8787"), 10),
+  baseUrl: BASE_URL,
+  redirectUri: REDIRECT_URI,
+  welcomeUrl: env("WELCOME_URL", "/welcome.html"),
+  signupUrl: env("SIGNUP_URL", "/signup.html"),
+  cookieSecret: env("COOKIE_SECRET", ""),
+  cookieSecure: env("COOKIE_SECURE", "false") === "true",
+  allowedOrigin: env("ALLOWED_ORIGIN", ""),
+
+  providers: {
+    microsoft: {
+      label: "Microsoft",
+      clientId: env("MS_CLIENT_ID", ""),
+      clientSecret: env("MS_CLIENT_SECRET", ""),
+      authorizeUrl:
+        "https://login.microsoftonline.com/" + MS_TENANT + "/oauth2/v2.0/authorize",
+      tokenUrl:
+        "https://login.microsoftonline.com/" + MS_TENANT + "/oauth2/v2.0/token",
+      userInfoUrl: "https://graph.microsoft.com/oidc/userinfo",
+      scopes: env("MS_SCOPES", "openid profile email User.Read"),
+      // Provider-specific extra params for the authorize request.
+      extraAuthParams: { response_mode: "query" }
+    },
+    google: {
+      label: "Google",
+      clientId: env("GOOGLE_CLIENT_ID", ""),
+      clientSecret: env("GOOGLE_CLIENT_SECRET", ""),
+      authorizeUrl: "https://accounts.google.com/o/oauth2/v2/auth",
+      tokenUrl: "https://oauth2.googleapis.com/token",
+      userInfoUrl: "https://openidconnect.googleapis.com/v1/userinfo",
+      scopes: env("GOOGLE_SCOPES", "openid profile email"),
+      extraAuthParams: { access_type: "offline", prompt: "consent" }
+    }
+  }
+};
+
+/** True if a provider has both a client id and secret configured. */
+function isProviderConfigured(name) {
+  var p = config.providers[name];
+  return !!(p && p.clientId && p.clientSecret);
+}
+
+module.exports = { config: config, isProviderConfigured: isProviderConfigured };

@@ -1,34 +1,23 @@
 /* =========================================================
    Lucy AI — free-trial sign-up (SSO + email)
    ---------------------------------------------------------
-   Front-end only. Real "Continue with Microsoft/Google"
-   requires:
-     1) An OAuth app registration per provider (client IDs).
-     2) A backend callback that exchanges the auth code for
-        tokens (never done in the browser).
-   Fill in the CONFIG below and implement the callback, then
-   the buttons will redirect users into the real consent flow.
-   Until CONFIG is filled, buttons show a friendly notice
-   instead of sending users into a broken redirect.
-   See docs/auth-setup.md.
+   The secure half of OAuth (PKCE, state, code<->token exchange
+   with the client secret) lives in the backend (see backend/).
+   The buttons here just hand off to the backend's start route:
+       GET {authBaseUrl}/auth/microsoft/start
+       GET {authBaseUrl}/auth/google/start
+   Set ssoEnabled = true and authBaseUrl once the backend is
+   deployed and its providers are configured. See docs/auth-setup.md.
    ========================================================= */
 (function () {
   "use strict";
 
   var CONFIG = {
-    microsoft: {
-      clientId: "",                 // Azure AD app (client) ID
-      tenant: "common",             // "common" | "organizations" | your tenant GUID
-      authorizeUrl: "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize",
-      redirectUri: window.location.origin + "/auth/callback",
-      scopes: "openid profile email User.Read"
-    },
-    google: {
-      clientId: "",                 // Google OAuth 2.0 client ID
-      authorizeUrl: "https://accounts.google.com/o/oauth2/v2/auth",
-      redirectUri: window.location.origin + "/auth/callback",
-      scopes: "openid profile email"
-    }
+    // Base URL of the deployed auth backend. "" = same origin as this site
+    // (e.g. when the backend serves the site with SERVE_STATIC=true).
+    authBaseUrl: "",
+    // Flip to true once the backend is live and providers are configured.
+    ssoEnabled: false
   };
 
   var note = document.getElementById("authNote");
@@ -39,50 +28,31 @@
     note.className = "form-note" + (kind ? " " + kind : "");
   }
 
-  function randomState() {
-    var a = new Uint8Array(16);
-    (window.crypto || {}).getRandomValues && window.crypto.getRandomValues(a);
-    return Array.prototype.map.call(a, function (b) {
-      return ("0" + b.toString(16)).slice(-2);
-    }).join("");
-  }
-
-  // Build a standards-compliant authorization-code redirect URL.
-  function buildAuthUrl(provider) {
-    var c = CONFIG[provider];
-    var base = c.authorizeUrl.replace("{tenant}", c.tenant || "common");
-    var state = randomState();
-    try { sessionStorage.setItem("lucy_oauth_state", state); } catch (e) {}
-    var params = new URLSearchParams({
-      client_id: c.clientId,
-      response_type: "code",
-      redirect_uri: c.redirectUri,
-      scope: c.scopes,
-      state: state
-    });
-    if (provider === "microsoft") { params.set("response_mode", "query"); }
-    if (provider === "google") { params.set("access_type", "offline"); params.set("prompt", "consent"); }
-    return base + "?" + params.toString();
-  }
-
   function startSso(provider, label) {
-    var c = CONFIG[provider];
-    if (!c || !c.clientId) {
+    if (!CONFIG.ssoEnabled) {
       showNote(
-        "Sign-in with " + label + " isn't connected yet. Add the " + label +
-        " client ID in js/signup.js (see docs/auth-setup.md) to enable it.",
+        "Sign-in with " + label + " isn't connected yet. Deploy the auth backend " +
+        "(see backend/README.md) and set ssoEnabled + authBaseUrl in js/signup.js.",
         "error"
       );
       return;
     }
     showNote("Redirecting to " + label + "…", "success");
-    window.location.assign(buildAuthUrl(provider));
+    var base = (CONFIG.authBaseUrl || "").replace(/\/$/, "");
+    window.location.assign(base + "/auth/" + provider + "/start");
   }
 
   var msBtn = document.getElementById("ssoMicrosoft");
   var gBtn = document.getElementById("ssoGoogle");
   if (msBtn) msBtn.addEventListener("click", function () { startSso("microsoft", "Microsoft"); });
   if (gBtn) gBtn.addEventListener("click", function () { startSso("google", "Google"); });
+
+  // Surface an error passed back from the backend callback (?error=...).
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var err = params.get("error");
+    if (err) showNote(err, "error");
+  } catch (e) {}
 
   // Email fallback — front-end capture only (wire to a backend/service later).
   var form = document.getElementById("trialForm");

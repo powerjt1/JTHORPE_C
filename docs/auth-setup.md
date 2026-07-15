@@ -8,22 +8,27 @@
 ## What exists today
 
 - `signup.html` — trial sign-up page: Microsoft/Google buttons + email fallback.
-- `js/signup.js` — builds standards-compliant authorization-code redirect URLs
-  from a `CONFIG` block. Until `clientId`s are filled in, the buttons show a
-  "not connected yet" notice instead of a broken redirect.
+- `js/signup.js` — SSO buttons hand off to the backend's start route
+  (`{authBaseUrl}/auth/:provider/start`). Set `ssoEnabled: true` + `authBaseUrl`
+  once the backend is live; until then the buttons show a "not connected yet"
+  notice. It also surfaces `?error=…` returned by the callback.
+- **`backend/`** — a Node/Express OAuth backend (Authorization Code + PKCE) that
+  owns state, PKCE, the code↔token exchange (with the client secret,
+  server-side), userinfo, and the session cookie. See
+  [`../backend/README.md`](../backend/README.md).
 
 ## What you must add
 
-1. **A backend callback** at a route you control (default assumed:
-   `/auth/callback`) that:
-   - validates the returned `state` against the one issued at sign-in,
-   - exchanges the `code` for tokens using the provider's **token endpoint**
-     with the **client secret** (server-side only),
-   - creates/looks up the trial account and starts a session,
-   - redirects the user into the app / trial.
-2. **Client IDs** pasted into `CONFIG` in `js/signup.js`.
-3. **Client secrets** stored server-side only (e.g. Azure Key Vault) — never in
-   this repo or any front-end file.
+1. **Deploy `backend/`** and give it the provider credentials via env
+   (`.env`, from `.env.example`). It provides:
+   - `GET /auth/:provider/start` — issues state + PKCE, redirects to consent,
+   - `GET /auth/callback` — validates `state`, exchanges the `code` for tokens
+     with the **client secret** (server-side only), fetches userinfo,
+     finds/creates the trial account, sets a session, redirects to `WELCOME_URL`.
+2. **Client IDs/secrets** in the backend `.env` (secrets server-side only, e.g.
+   Azure Key Vault — never in this repo or any front-end file).
+3. **Point the site at the backend:** set `authBaseUrl` + `ssoEnabled: true` in
+   `js/signup.js`.
 
 ## Microsoft (Entra ID / Azure AD)
 
@@ -59,13 +64,12 @@ callback lives elsewhere.
 
 ## Security notes
 
-- **PKCE:** for a public client, add PKCE (`code_challenge` / `code_verifier`).
-  The current build uses the plain authorization-code redirect; add PKCE when
-  you implement the callback.
+- **PKCE:** the backend uses PKCE (S256) — `code_challenge` on start,
+  `code_verifier` on token exchange — carried in a signed httpOnly cookie.
 - **Secrets never in the browser.** Client secrets and token exchange are
-  server-side only.
-- **State/CSRF:** `signup.js` issues a random `state` and stores it in
-  `sessionStorage`; the callback must verify it.
+  server-side only (in `backend/`).
+- **State/CSRF:** the backend issues a random `state` and stores it (with the
+  PKCE verifier) in a signed httpOnly cookie; the callback verifies it.
 - **Relation to Nexus:** end-user trial sign-in is separate from the internal
   agent connections. If a trial later needs delegated Microsoft 365 access, that
   connection should be provisioned and brokered through
