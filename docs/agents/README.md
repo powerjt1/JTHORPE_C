@@ -42,7 +42,7 @@ Lucy AI is a persona-driven, multi-agent system:
 | # | Agent | Role | Priority | Group | Spec |
 |---|-------|------|----------|-------|------|
 | 0 | **Nexus** | Master Connector — centralized auth, credentials, proxy, rate limiting, audit | — | Infra | [spec](./00-nexus-master-connector.md) ✅ |
-| — | **Christina** | Orchestrator — request routing & synthesis | — | Infra | _pending_ |
+| — | **Christina** | Orchestrator — request routing & synthesis | — | Infra | [spec](./christina-orchestrator.md) ✅ |
 | 1 | **O365 & Power Platform MCP** | Solution development for M365 + Power Platform | HIGH | C · Dev | [spec](./01-o365-pp-mcp.md) ✅ |
 | 2 | **DLP Architect** | Data protection & loss-prevention design | HIGH | B · Sec/Comp | [spec](./02-dlp-architect.md) ✅ |
 | 3 | **PP Governance Officer** | CoE leadership & governance | HIGH | A · Ops | [spec](./03-pp-governance-officer.md) ✅ |
