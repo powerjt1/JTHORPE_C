@@ -67,11 +67,30 @@
         return;
       }
       var email = form.email.value.trim();
-      // TODO: POST to your trial-provisioning endpoint (JABB backend / service).
-      // eslint-disable-next-line no-console
-      console.log("Trial sign-up (demo):", { email: email });
       // Hand the email to the welcome screen without putting PII in the URL.
       try { sessionStorage.setItem("lucy_trial_email", email); } catch (err) {}
+
+      if (CONFIG.ssoEnabled) {
+        // Backend is live: create the trial + send the welcome email (Gmail or
+        // Outlook, per the backend's EMAIL_PROVIDER).
+        showNote("Setting up your trial…", "success");
+        var base = (CONFIG.authBaseUrl || "").replace(/\/$/, "");
+        fetch(base + "/email/trial", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email: email })
+        }).then(function () {
+          window.location.assign("welcome.html");
+        }).catch(function () {
+          window.location.assign("welcome.html");
+        });
+        return;
+      }
+
+      // Front-end only (backend not wired yet).
+      // eslint-disable-next-line no-console
+      console.log("Trial sign-up (demo):", { email: email });
       showNote("Thanks! Taking you to the next step…", "success");
       window.location.assign("welcome.html");
     });

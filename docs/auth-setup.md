@@ -75,8 +75,22 @@ callback lives elsewhere.
   connection should be provisioned and brokered through
   [Nexus (#0)](./agents/00-nexus-master-connector.md), not stored in the app.
 
-## Email fallback
+## Trial email (Gmail or Outlook)
 
-The email form currently logs to the console as a demo. Replace the marked
-`TODO` in `js/signup.js` with a POST to your trial-provisioning endpoint
-(JABB backend / service) to send a real confirmation + start the trial.
+The trial welcome/confirmation is sent by the backend through the user's
+ecosystem — set `EMAIL_PROVIDER` in the backend `.env`:
+
+- **`graph`** — Microsoft Graph / Outlook, sending as **info@jabbnetworks.com**.
+  Register an Entra app with the **application** permission `Mail.Send`
+  (admin-consented) and set `EMAIL_GRAPH_CLIENT_ID/SECRET` (or reuse `MS_*`).
+- **`gmail`** — Gmail API, sending as **jabbnetworks@gmail.com**. Create an
+  OAuth client and obtain a **refresh token** for that mailbox with the
+  `gmail.send` scope; set `GMAIL_CLIENT_ID/SECRET/REFRESH_TOKEN`.
+- **`none`** (default) — logs instead of sending, so the flow runs without
+  email config.
+
+The backend sends the welcome email automatically after a new sign-in
+(`/auth/callback`) or email-fallback sign-up (`/email/trial`), and exposes
+`/email/resend` for the welcome page's "Resend email" button. When the site is
+served from a different origin than the backend, set `ALLOWED_ORIGIN` so those
+`fetch` calls are permitted. See [`../backend/README.md`](../backend/README.md).

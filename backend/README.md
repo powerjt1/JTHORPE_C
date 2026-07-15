@@ -30,9 +30,25 @@ from the signed transaction cookie.
 |---|---|---|
 | GET | `/auth/microsoft/start` | Begin Microsoft sign-in |
 | GET | `/auth/google/start` | Begin Google sign-in |
-| GET | `/auth/callback` | OAuth redirect target (both providers) |
+| GET | `/auth/callback` | OAuth redirect target (both providers); sends welcome email on new trials |
 | POST | `/auth/logout` | Clear the session cookie |
-| GET | `/healthz` | Liveness + which providers are configured |
+| POST | `/email/trial` | Email-fallback sign-up: create trial + send welcome |
+| POST | `/email/resend` | Re-send the welcome email to the signed-in user |
+| GET | `/healthz` | Liveness + which providers/email transport are configured |
+
+## Email (Gmail or Outlook)
+
+The trial welcome/confirmation email is sent through the user's ecosystem —
+pick the transport with `EMAIL_PROVIDER`:
+
+| `EMAIL_PROVIDER` | Sends via | Sender (`EMAIL_FROM`) | Needs |
+|---|---|---|---|
+| `none` (default) | logs to console | — | nothing (dev) |
+| `graph` | Microsoft Graph / Outlook | `info@jabbnetworks.com` | Entra app with **Mail.Send** application permission (admin-consented) |
+| `gmail` | Gmail API | `jabbnetworks@gmail.com` | OAuth client + a **refresh token** for that mailbox with the `gmail.send` scope |
+
+Set the credentials in `.env` (see `.env.example`). The send is fired
+after account creation and never blocks sign-in if email is down.
 
 ## Run locally
 

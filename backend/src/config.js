@@ -48,6 +48,29 @@ var config = {
       scopes: env("GOOGLE_SCOPES", "openid profile email"),
       extraAuthParams: { access_type: "offline", prompt: "consent" }
     }
+  },
+
+  // Outbound email for the trial welcome/confirmation. Sent via the user's
+  // ecosystem: Gmail API ("gmail") or Microsoft Graph / Outlook ("graph").
+  // "none" (default) just logs — so the backend runs without email config.
+  email: {
+    provider: env("EMAIL_PROVIDER", "none"), // none | graph | gmail
+    from: env("EMAIL_FROM", ""),             // sender mailbox address
+    fromName: env("EMAIL_FROM_NAME", "Lucy AI"),
+    // Microsoft Graph (Outlook) — app-only send as EMAIL_FROM (needs Mail.Send
+    // application permission). Falls back to the MS_* sign-in app if unset.
+    graph: {
+      tenant: env("EMAIL_GRAPH_TENANT", MS_TENANT),
+      clientId: env("EMAIL_GRAPH_CLIENT_ID", env("MS_CLIENT_ID", "")),
+      clientSecret: env("EMAIL_GRAPH_CLIENT_SECRET", env("MS_CLIENT_SECRET", ""))
+    },
+    // Gmail API — send as EMAIL_FROM using an OAuth refresh token for that
+    // mailbox. Falls back to the GOOGLE_* sign-in app if unset.
+    gmail: {
+      clientId: env("GMAIL_CLIENT_ID", env("GOOGLE_CLIENT_ID", "")),
+      clientSecret: env("GMAIL_CLIENT_SECRET", env("GOOGLE_CLIENT_SECRET", "")),
+      refreshToken: env("GMAIL_REFRESH_TOKEN", "")
+    }
   }
 };
 

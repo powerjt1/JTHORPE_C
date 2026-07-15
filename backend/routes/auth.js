@@ -15,6 +15,7 @@ var config = cfg.config;
 var isProviderConfigured = cfg.isProviderConfigured;
 var oauth = require("../src/oauth");
 var accounts = require("../src/accounts");
+var email = require("../src/email");
 
 var TX_COOKIE = "lucy_oauth_tx"; // short-lived transaction (state + PKCE + provider)
 var SESSION_COOKIE = "lucy_session";
@@ -114,6 +115,16 @@ router.get("/callback", async function (req, res) {
     }
 
     var account = accounts.findOrCreateTrialAccount(profile);
+
+    // Send the welcome/confirmation email for brand-new trials (Gmail or
+    // Outlook/Graph, per EMAIL_PROVIDER). Non-blocking — never fail sign-in
+    // because email is down.
+    if (account.isNew) {
+      email.sendTrialWelcome(account.email, { name: account.name }).catch(function (e) {
+        // eslint-disable-next-line no-console
+        console.error("[auth/callback] welcome email failed:", e && e.message ? e.message : e);
+      });
+    }
 
     // Minimal session. In production, prefer a signed JWT or a server-side
     // session store; do NOT put provider tokens in the browser.
