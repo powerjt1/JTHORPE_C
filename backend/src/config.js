@@ -30,6 +30,11 @@ var config = {
   // Where /auth/verify sends users after success (defaults to WELCOME_URL).
   verifiedUrl: env("VERIFIED_URL", ""),
 
+  // Account store: "memory" (default) or "remote" (Python SQLite bridge in db/).
+  accountsStore: env("ACCOUNTS_STORE", "memory"),
+  dbBridgeUrl: env("DB_BRIDGE_URL", "http://localhost:8799"),
+  dbToken: env("DB_TOKEN", ""),
+
   providers: {
     microsoft: {
       label: "Microsoft",

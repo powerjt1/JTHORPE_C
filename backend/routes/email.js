@@ -39,7 +39,7 @@ router.post("/trial", async function (req, res) {
     return res.status(400).json({ ok: false, error: "A valid email is required." });
   }
 
-  var account = accounts.findOrCreateTrialAccount({ provider: "email", sub: null, email: addr, name: null });
+  var account = await accounts.findOrCreateTrialAccount({ provider: "email", sub: null, email: addr, name: null });
 
   if (account.isNew) {
     try {
@@ -77,7 +77,7 @@ router.post("/resend", async function (req, res) {
 
   try {
     // Re-issue a confirm link only if this account still needs verifying.
-    var acc = accounts.getByEmail(session.email);
+    var acc = await accounts.getByEmail(session.email);
     var opts = { name: session.name };
     if (!acc || !acc.emailVerified) {
       opts.verifyUrl = verification.makeVerifyUrl(session.email);

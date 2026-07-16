@@ -115,7 +115,7 @@ router.get("/callback", async function (req, res) {
       return redirectWithError(res, "We couldn't read an email from your account.");
     }
 
-    var account = accounts.findOrCreateTrialAccount(profile);
+    var account = await accounts.findOrCreateTrialAccount(profile);
 
     // Send the welcome/confirmation email for brand-new trials (Gmail or
     // Outlook/Graph, per EMAIL_PROVIDER). Non-blocking — never fail sign-in
@@ -148,7 +148,7 @@ router.get("/callback", async function (req, res) {
 });
 
 // ---- Verify email (from the link in the welcome email) ----
-router.get("/verify", function (req, res) {
+router.get("/verify", async function (req, res) {
   var token = req.query && req.query.token;
   if (!token) {
     return redirectWithError(res, "Missing verification token.");
@@ -168,7 +168,13 @@ router.get("/verify", function (req, res) {
     return redirectWithError(res, "That confirmation link isn't valid.");
   }
 
-  accounts.markVerifiedByEmail(claims.email);
+  try {
+    await accounts.markVerifiedByEmail(claims.email);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("[auth/verify]", e && e.message ? e.message : e);
+    return redirectWithError(res, "Couldn't confirm your email right now. Please try again.");
+  }
 
   var dest = (config.verifiedUrl || config.welcomeUrl);
   dest += (dest.indexOf("?") === -1 ? "?" : "&") + "verified=1";

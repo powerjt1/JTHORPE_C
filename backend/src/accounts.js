@@ -1,72 +1,117 @@
 "use strict";
 
 /**
- * Trial-account store — SCAFFOLD ONLY.
+ * Trial-account store facade.
  *
- * This keeps accounts in memory so the flow runs end to end in dev. Replace
- * the Map with your real data store (and, if you provision Microsoft 365
- * access for the trial user, broker that connection through Nexus — see
- * docs/agents/00-nexus-master-connector.md — rather than storing tokens here).
+ * Two backends, chosen by ACCOUNTS_STORE:
+ *   - "memory" (default) — in-process Map; resets on restart. Fine for dev.
+ *   - "remote"           — the Python SQLite bridge in ../../db (persistent).
+ *
+ * All methods are async so the two backends are interchangeable. If you later
+ * provision Microsoft 365 access for a trial user, broker that connection
+ * through Nexus (docs/agents/00-nexus-master-connector.md) — don't store
+ * provider tokens here.
  */
 
+var config = require("./config").config;
+
+// ---------------------------------------------------------------------------
+// In-memory backend
+// ---------------------------------------------------------------------------
 var byKey = new Map();
 
 function keyFor(profile) {
   return profile.provider + ":" + (profile.sub || profile.email);
 }
 
-/**
- * Find an existing trial account for this profile or create one.
- * SSO sign-ins (provider !== "email") arrive with a provider-verified email,
- * so they're marked verified on creation; email-fallback sign-ups are not.
- * @returns {{ id, email, name, provider, emailVerified, isNew, trialStartedAt }}
- */
-function findOrCreateTrialAccount(profile) {
-  var key = keyFor(profile);
-  var existing = byKey.get(key);
-  if (existing) {
-    return Object.assign({}, existing, { isNew: false });
+var memory = {
+  async findOrCreate(profile) {
+    var key = keyFor(profile);
+    var existing = byKey.get(key);
+    if (existing) return Object.assign({}, existing, { isNew: false });
+    var account = {
+      id: key,
+      email: profile.email,
+      name: profile.name,
+      provider: profile.provider,
+      emailVerified: profile.provider !== "email",
+      trialStartedAt: new Date().toISOString(),
+      verifiedAt: null
+    };
+    byKey.set(key, account);
+    return Object.assign({}, account, { isNew: true });
+  },
+  async getByEmail(emailAddr) {
+    var target = String(emailAddr || "").toLowerCase();
+    for (var acc of byKey.values()) {
+      if (acc.email && acc.email.toLowerCase() === target) return Object.assign({}, acc);
+    }
+    return null;
+  },
+  async markVerifiedByEmail(emailAddr) {
+    var target = String(emailAddr || "").toLowerCase();
+    var n = 0;
+    for (var acc of byKey.values()) {
+      if (acc.email && acc.email.toLowerCase() === target && !acc.emailVerified) {
+        acc.emailVerified = true;
+        acc.verifiedAt = new Date().toISOString();
+        n++;
+      }
+    }
+    return n;
   }
-  var account = {
-    id: key,
-    email: profile.email,
-    name: profile.name,
-    provider: profile.provider,
-    emailVerified: profile.provider !== "email",
-    trialStartedAt: new Date().toISOString()
-  };
-  byKey.set(key, account);
-  // TODO: persist to your database; kick off trial provisioning.
-  return Object.assign({}, account, { isNew: true });
+};
+
+// ---------------------------------------------------------------------------
+// Remote backend (Python SQLite bridge)
+// ---------------------------------------------------------------------------
+async function bridgeFetch(path, options) {
+  var url = config.dbBridgeUrl.replace(/\/$/, "") + path;
+  var headers = Object.assign({ "Content-Type": "application/json" }, (options && options.headers) || {});
+  if (config.dbToken) headers["X-DB-Token"] = config.dbToken;
+  var res = await fetch(url, Object.assign({}, options, { headers: headers }));
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    throw new Error("db bridge " + path + " failed (" + res.status + "): " + (data.error || ""));
+  }
+  return data;
 }
 
-/** Return a copy of the first account matching this email, or null. */
-function getByEmail(emailAddr) {
-  var target = String(emailAddr || "").toLowerCase();
-  for (var acc of byKey.values()) {
-    if (acc.email && acc.email.toLowerCase() === target) {
-      return Object.assign({}, acc);
-    }
+var remote = {
+  async findOrCreate(profile) {
+    var data = await bridgeFetch("/accounts/find-or-create", {
+      method: "POST",
+      body: JSON.stringify({
+        provider: profile.provider,
+        sub: profile.sub || null,
+        email: profile.email,
+        name: profile.name || null
+      })
+    });
+    return data.account;
+  },
+  async getByEmail(emailAddr) {
+    var data = await bridgeFetch("/accounts/by-email?email=" + encodeURIComponent(emailAddr), { method: "GET" });
+    return data.account || null;
+  },
+  async markVerifiedByEmail(emailAddr) {
+    var data = await bridgeFetch("/accounts/verify", {
+      method: "POST",
+      body: JSON.stringify({ email: emailAddr })
+    });
+    return data.updated || 0;
   }
-  return null;
-}
+};
 
-/** Mark every account with this email as verified. Returns the count updated. */
-function markVerifiedByEmail(emailAddr) {
-  var target = String(emailAddr || "").toLowerCase();
-  var n = 0;
-  for (var acc of byKey.values()) {
-    if (acc.email && acc.email.toLowerCase() === target && !acc.emailVerified) {
-      acc.emailVerified = true;
-      acc.verifiedAt = new Date().toISOString();
-      n++;
-    }
-  }
-  return n;
+// ---------------------------------------------------------------------------
+// Facade
+// ---------------------------------------------------------------------------
+function backend() {
+  return config.accountsStore === "remote" ? remote : memory;
 }
 
 module.exports = {
-  findOrCreateTrialAccount: findOrCreateTrialAccount,
-  getByEmail: getByEmail,
-  markVerifiedByEmail: markVerifiedByEmail
+  findOrCreateTrialAccount: function (profile) { return backend().findOrCreate(profile); },
+  getByEmail: function (emailAddr) { return backend().getByEmail(emailAddr); },
+  markVerifiedByEmail: function (emailAddr) { return backend().markVerifiedByEmail(emailAddr); }
 };
