@@ -102,6 +102,12 @@ Backend endpoints (in `backend/routes/projects.js`): `POST /projects`,
 `GET /projects`, `GET /projects/:id`, `POST /projects/:id/tick`. Projects and
 their tasks persist via the account store (`memory` or the `db/` SQLite bridge).
 
+**My Projects dashboard** (`projects.html` + `js/projects.js`): a signed-in
+surface that lists the user's projects (`GET /projects`), opens one to view its
+board (`GET /projects/:id`), and resumes any unfinished project (ticks to
+completion). Uses the same `window.AIOS_CONFIG` gate; shows a "sign in" state
+when live mode is off or the visitor isn't authenticated.
+
 ## Design & implementation notes
 
 - **Accessibility:** honor `prefers-reduced-motion` (the concept page already

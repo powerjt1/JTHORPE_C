@@ -26,6 +26,10 @@
 *::before,
 *::after { box-sizing: border-box; }
 
+/* The `hidden` attribute must win even over display-setting utility classes
+   (e.g. .btn { display: inline-flex }), which otherwise override it. */
+[hidden] { display: none !important; }
+
 html { scroll-behavior: smooth; }
 
 @media (prefers-reduced-motion: reduce) {
