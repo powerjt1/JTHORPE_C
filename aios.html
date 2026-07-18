@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIOS Mission Control — Lucy AI</title>
+  <meta name="description" content="JABBNETWORKS AIOS — an interactive AI mission-control room where Lucy orchestrates a team of specialist AI avatars: architecture, automation, apps, dashboards, QA, and security. Powered by JABB Networks." />
+  <meta name="theme-color" content="#0b1020" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/aios.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ===== Header ===== -->
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Lucy AI home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32" role="img" aria-hidden="true">
+            <defs>
+              <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#7c5cff" />
+                <stop offset="1" stop-color="#22d3ee" />
+              </linearGradient>
+            </defs>
+            <rect x="2" y="2" width="28" height="28" rx="9" fill="url(#lg)" />
+            <path d="M11 9v11h8" fill="none" stroke="#0b1020" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="21" cy="11" r="2.2" fill="#0b1020" />
+          </svg>
+        </span>
+        <span class="brand-name">Lucy<span class="brand-accent">AI</span></span>
+      </a>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-menu" id="nav-menu">
+          <li><a href="index.html#services">Services</a></li>
+          <li><a href="team.html">Team</a></li>
+          <li><a href="aios.html" aria-current="page">AIOS</a></li>
+          <li><a href="signup.html" class="btn btn-nav">Start free trial</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ===== Hero / command bar ===== -->
+    <section class="section aios-hero">
+      <div class="container">
+        <p class="eyebrow">JABBNETWORKS AIOS <span class="demo-badge">Interactive concept</span></p>
+        <h1>Your AI engineering team, in mission control</h1>
+        <p class="section-sub">
+          Speak to <strong>Lucy</strong> and watch her orchestrate a team of specialist
+          AI avatars — architecture, automation, apps, dashboards, QA, and security —
+          from one command center.
+        </p>
+
+        <form class="mc-command" id="commandForm" autocomplete="off">
+          <label class="sr-only" for="command">Command for Lucy</label>
+          <input type="text" id="command" name="command"
+                 placeholder="Lucy, start a new client project…" />
+          <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+        <div class="mc-controls">
+          <button type="button" class="btn btn-ghost" id="runDemo">▶ Run project demo</button>
+          <button type="button" class="btn btn-ghost" id="resetDemo">↺ Reset</button>
+          <span class="mc-hint">Tip: click any avatar to open its workspace.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Mission control ===== -->
+    <section class="section aios-grid-section">
+      <div class="container aios-layout">
+
+        <!-- Left: status board + log -->
+        <div class="mc-panel">
+          <div class="mc-board">
+            <header class="mc-board-head">
+              <h2>Project status</h2>
+              <span class="mc-project" id="projectName">No active project</span>
+            </header>
+            <div class="mc-progress"><div class="mc-progress-bar" id="progressBar"></div></div>
+            <ol class="mc-phases" id="phases">
+              <li data-agent="lucy"><span class="ph-name">Orchestration</span><span class="ph-status" data-status="idle">Idle</span></li>
+              <li data-agent="julian"><span class="ph-name">Architecture</span><span class="ph-status" data-status="idle">Idle</span></li>
+              <li data-agent="jabb"><span class="ph-name">Environment setup</span><span class="ph-status" data-status="idle">Idle</span></li>
+              <li data-agent="alex"><span class="ph-name">Automation &amp; RPA</span><span class="ph-status" data-status="idle">Idle</span></li>
+              <li data-agent="brianna"><span class="ph-name">App development</span><span class="ph-status" data-status="idle">Idle</span></li>
+              <li data-agent="bianca"><span class="ph-name">Dashboards &amp; portals</span><span class="ph-status" data-status="idle">Idle</span></li>
+              <li data-agent="phoenix"><span class="ph-name">QA &amp; release</span><span class="ph-status" data-status="idle">Idle</span></li>
+              <li data-agent="sentinel"><span class="ph-name">Security &amp; compliance</span><span class="ph-status" data-status="idle">Idle</span></li>
+            </ol>
+          </div>
+
+          <div class="mc-log" aria-live="polite">
+            <header class="mc-log-head">Activity log</header>
+            <ul id="log"><li class="log-empty">Awaiting your command…</li></ul>
+          </div>
+        </div>
+
+        <!-- Right: avatar team -->
+        <div class="agents" id="agents">
+          <!-- Agent cards injected/enhanced by JS; static markup for no-JS -->
+          <button class="agent-card" data-agent="lucy" style="--accent:#7c5cff">
+            <span class="agent-avatar" data-state="idle"><span class="avatar-aura"></span><span class="avatar-face">🎯</span></span>
+            <span class="agent-name">Lucy</span><span class="agent-role">AI Orchestrator</span>
+            <span class="agent-state-label">Idle</span>
+          </button>
+          <button class="agent-card" data-agent="julian" style="--accent:#3b82f6">
+            <span class="agent-avatar" data-state="idle"><span class="avatar-aura"></span><span class="avatar-face">🏛️</span></span>
+            <span class="agent-name">Julian</span><span class="agent-role">Enterprise Architect</span>
+            <span class="agent-state-label">Idle</span>
+          </button>
+          <button class="agent-card" data-agent="jabb" style="--accent:#6366f1">
+            <span class="agent-avatar" data-state="idle"><span class="avatar-aura"></span><span class="avatar-face">🛰️</span></span>
+            <span class="agent-name">JABBNETWORKS</span><span class="agent-role">Platform Operations</span>
+            <span class="agent-state-label">Idle</span>
+          </button>
+          <button class="agent-card" data-agent="alex" style="--accent:#f59e0b">
+            <span class="agent-avatar" data-state="idle"><span class="avatar-aura"></span><span class="avatar-face">🤖</span></span>
+            <span class="agent-name">Alex</span><span class="agent-role">Automation &amp; RPA</span>
+            <span class="agent-state-label">Idle</span>
+          </button>
+          <button class="agent-card" data-agent="brianna" style="--accent:#ec4899">
+            <span class="agent-avatar" data-state="idle"><span class="avatar-aura"></span><span class="avatar-face">📱</span></span>
+            <span class="agent-name">Brianna</span><span class="agent-role">Power Apps Developer</span>
+            <span class="agent-state-label">Idle</span>
+          </button>
+          <button class="agent-card" data-agent="bianca" style="--accent:#14b8a6">
+            <span class="agent-avatar" data-state="idle"><span class="avatar-aura"></span><span class="avatar-face">📊</span></span>
+            <span class="agent-name">Bianca</span><span class="agent-role">Power Pages &amp; Power BI</span>
+            <span class="agent-state-label">Idle</span>
+          </button>
+          <button class="agent-card" data-agent="phoenix" style="--accent:#f97316">
+            <span class="agent-avatar" data-state="idle"><span class="avatar-aura"></span><span class="avatar-face">🚀</span></span>
+            <span class="agent-name">Phoenix</span><span class="agent-role">QA &amp; DevOps</span>
+            <span class="agent-state-label">Idle</span>
+          </button>
+          <button class="agent-card" data-agent="sentinel" style="--accent:#10b981">
+            <span class="agent-avatar" data-state="idle"><span class="avatar-aura"></span><span class="avatar-face">🛡️</span></span>
+            <span class="agent-name">Sentinel</span><span class="agent-role">Security &amp; Governance</span>
+            <span class="agent-state-label">Idle</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Roadmap note ===== -->
+    <section class="section section-alt">
+      <div class="container section-head">
+        <p class="eyebrow">Where this is going</p>
+        <h2>From concept to full AI mission control</h2>
+        <p class="section-sub">
+          This interactive demo previews the experience. The full AIOS adds real-time
+          3D avatars, natural voice in and out, and live Power Platform execution —
+          so speaking to Lucy actually spins up environments, apps, and dashboards.
+        </p>
+        <p style="margin-top:20px;">
+          <a href="signup.html" class="btn btn-primary">Start free trial</a>
+          <a href="team.html" class="btn btn-ghost">Meet the team</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Agent workspace modal ===== -->
+  <div class="agent-modal" id="agentModal" hidden>
+    <div class="agent-modal-backdrop" data-close></div>
+    <div class="agent-modal-card" role="dialog" aria-modal="true" aria-labelledby="modalName">
+      <button class="agent-modal-close" data-close aria-label="Close">✕</button>
+      <div class="modal-head">
+        <span class="agent-avatar modal-avatar" data-state="speaking"><span class="avatar-aura"></span><span class="avatar-face" id="modalFace">🎯</span></span>
+        <div>
+          <h3 id="modalName">Lucy</h3>
+          <p class="modal-role" id="modalRole">AI Orchestrator</p>
+        </div>
+      </div>
+      <p class="modal-personality" id="modalPersonality"></p>
+      <h4>In the workspace</h4>
+      <ul class="modal-caps" id="modalCaps"></ul>
+      <p class="modal-anim" id="modalAnim"></p>
+    </div>
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="brand-name">Lucy<span class="brand-accent">AI</span></span>
+        <p>Intelligent automation for growing businesses.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="index.html#services">Services</a>
+        <a href="team.html">Team</a>
+        <a href="aios.html">AIOS</a>
+        <a href="signup.html">Start free trial</a>
+      </nav>
+    </div>
+    <div class="container footer-bottom">
+      <p>&copy; <span id="year">2026</span> Lucy AI. All rights reserved.</p>
+      <p class="powered">
+        Powered by
+        <a href="https://jabbnetworks.com" target="_blank" rel="noopener noreferrer">JABB&nbsp;Networks</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/main.js" defer></script>
+  <script src="js/aios.js" defer></script>
+</body>
+</html>

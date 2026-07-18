@@ -1,0 +1,231 @@
+/* =========================================================
+   Lucy AI — AIOS Mission Control (interactive concept demo)
+   Pure front-end simulation: avatar states, a scripted
+   orchestration sequence, and a click-to-open workspace.
+   No real AI/voice — see docs/avatar-system.md for the roadmap.
+   ========================================================= */
+(function () {
+  "use strict";
+
+  var reduceMotion = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var AGENTS = {
+    lucy: {
+      name: "Lucy", role: "AI Orchestrator", face: "🎯", accent: "#7c5cff",
+      personality: "Calm, confident, professional. Lucy runs the room — she reads your intent, plans the work, and delegates to the right specialist.",
+      caps: ["Turns a request into a project plan", "Assigns tasks to the right specialist", "Tracks status and keeps a human in the loop", "Synthesizes everyone's work into one answer"],
+      anim: "Gestures while assigning tasks and looks toward each specialist as she delegates."
+    },
+    julian: {
+      name: "Julian", role: "Enterprise Architect", face: "🏛️", accent: "#3b82f6",
+      personality: "Big-picture and precise. Julian designs solutions that scale and hold up under real load.",
+      caps: ["Designs enterprise solution architecture", "Chooses the right Power Platform + Azure services", "Plans ALM, environments, and integration patterns", "Reviews for cost and scale"],
+      anim: "Draws solution diagrams in the air and rotates 3D system models."
+    },
+    jabb: {
+      name: "JABBNETWORKS", role: "Platform Operations", face: "🛰️", accent: "#6366f1",
+      personality: "The steady hand on the platform. Provisions, connects, and keeps everything running.",
+      caps: ["Provisions environments and tenants", "Links APIs and connections (via the secure gateway)", "Monitors servers and health", "Deploys solutions"],
+      anim: "Configures environments, links APIs, monitors servers, and deploys solutions."
+    },
+    alex: {
+      name: "Alex", role: "Automation & RPA", face: "🤖", accent: "#f59e0b",
+      personality: "Relentless about removing busywork. If it repeats, Alex automates it.",
+      caps: ["Designs cloud and desktop flows (RPA)", "Wires up data and notifications", "Handles retries and error paths", "Watches automations execute"],
+      anim: "Connects flow blocks and watches cloud and desktop flow paths light up."
+    },
+    brianna: {
+      name: "Brianna", role: "Power Apps Developer", face: "📱", accent: "#ec4899",
+      personality: "Design-minded builder. Turns requirements into apps people actually enjoy using.",
+      caps: ["Builds canvas and model-driven apps", "Designs forms and responsive layouts", "Connects apps to data and flows", "Previews across devices"],
+      anim: "Builds forms, drags controls onto a canvas, and previews responsive layouts."
+    },
+    bianca: {
+      name: "Bianca", role: "Power Pages & Power BI", face: "📊", accent: "#14b8a6",
+      personality: "Storyteller with data. Makes information clear, live, and beautiful.",
+      caps: ["Builds Power BI dashboards", "Creates Power Pages portals", "Models and refreshes data", "Publishes live reports"],
+      anim: "Charts animate into view, dashboards update live, and portals render on floating screens."
+    },
+    phoenix: {
+      name: "Phoenix", role: "QA & DevOps", face: "🚀", accent: "#f97316",
+      personality: "Calm under pressure. Ships confidently because everything is tested.",
+      caps: ["Runs automated tests", "Manages release pipelines", "Gates deployments on quality", "Rolls back safely when needed"],
+      anim: "Runs automated tests, shows green checkmarks, and manages release pipelines."
+    },
+    sentinel: {
+      name: "Sentinel", role: "Security & Governance", face: "🛡️", accent: "#10b981",
+      personality: "Watchful and exacting. Protects data and enforces the rules, quietly and constantly.",
+      caps: ["Scans for threats and misconfig", "Enforces DLP and access policy", "Validates compliance", "Locks down sensitive resources"],
+      anim: "Scans systems, highlights threats, locks resources, and validates compliance."
+    }
+  };
+
+  // Ordered orchestration script (agent + what they say + phase index).
+  var SCRIPT = [
+    { id: "lucy",     say: "On it. Spinning up the project and briefing the team.", phase: 0 },
+    { id: "julian",   say: "Designing the architecture and target environments.",   phase: 1 },
+    { id: "jabb",     say: "Provisioning environments and linking connections.",     phase: 2 },
+    { id: "alex",     say: "Building the automations and flows.",                    phase: 3 },
+    { id: "brianna",  say: "Building the app and its screens.",                      phase: 4 },
+    { id: "bianca",   say: "Creating dashboards and the client portal.",            phase: 5 },
+    { id: "phoenix",  say: "Running tests and preparing the release.",              phase: 6 },
+    { id: "sentinel", say: "Scanning for threats and validating compliance.",        phase: 7 }
+  ];
+
+  var cards = {};
+  document.querySelectorAll(".agent-card").forEach(function (card) {
+    cards[card.dataset.agent] = card;
+  });
+  var phaseItems = Array.prototype.slice.call(document.querySelectorAll("#phases li"));
+  var progressBar = document.getElementById("progressBar");
+  var logEl = document.getElementById("log");
+  var projectName = document.getElementById("projectName");
+  var timers = [];
+
+  function setAvatarState(id, state) {
+    var card = cards[id];
+    if (!card) return;
+    var av = card.querySelector(".agent-avatar");
+    var label = card.querySelector(".agent-state-label");
+    if (av) av.dataset.state = state;
+    if (label) label.textContent = state.charAt(0).toUpperCase() + state.slice(1);
+    card.dataset.active = (state === "speaking" || state === "active") ? "1" : "";
+  }
+
+  function setPhase(index, status) {
+    var li = phaseItems[index];
+    if (!li) return;
+    var pill = li.querySelector(".ph-status");
+    pill.dataset.status = status;
+    pill.textContent = status === "active" ? "Active" : status === "done" ? "Done" : "Idle";
+    li.dataset.active = status === "active" ? "1" : "";
+  }
+
+  function log(id, message) {
+    var empty = logEl.querySelector(".log-empty");
+    if (empty) empty.remove();
+    var li = document.createElement("li");
+    li.style.setProperty("--accent", AGENTS[id] ? AGENTS[id].accent : "var(--brand)");
+    var who = AGENTS[id] ? AGENTS[id].name : id;
+    li.innerHTML = '<span class="log-agent">' + who + ":</span> " + message;
+    logEl.appendChild(li);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+  function resetAll(keepLog) {
+    clearTimers();
+    Object.keys(cards).forEach(function (id) { setAvatarState(id, "idle"); });
+    phaseItems.forEach(function (_, i) { setPhase(i, "idle"); });
+    progressBar.style.width = "0";
+    projectName.textContent = "No active project";
+    if (!keepLog) logEl.innerHTML = '<li class="log-empty">Awaiting your command…</li>';
+  }
+
+  function runDemo(project) {
+    resetAll(true);
+    projectName.textContent = project || "New client project";
+    log("lucy", "Starting <strong>" + (project || "New client project") + "</strong>. Briefing the team…");
+
+    var stepMs = reduceMotion ? 0 : 1100;
+
+    SCRIPT.forEach(function (step, i) {
+      timers.push(setTimeout(function () {
+        // Everyone not-current goes to listening; current speaks/works.
+        Object.keys(cards).forEach(function (id) {
+          if (id !== step.id) {
+            var av = cards[id].querySelector(".agent-avatar");
+            if (av.dataset.state !== "done") setAvatarState(id, "listening");
+          }
+        });
+        setAvatarState(step.id, step.id === "lucy" ? "speaking" : "active");
+        setPhase(step.phase, "active");
+        progressBar.style.width = Math.round(((i + 0.5) / SCRIPT.length) * 100) + "%";
+        log(step.id, step.say);
+
+        // Mark the step done shortly after (except keep last visible).
+        timers.push(setTimeout(function () {
+          setPhase(step.phase, "done");
+          setAvatarState(step.id, "done");
+          if (i === SCRIPT.length - 1) {
+            progressBar.style.width = "100%";
+            log("lucy", "✅ Project ready. Everything's tested, secured, and live.");
+            setAvatarState("lucy", "active");
+          }
+        }, reduceMotion ? 0 : stepMs * 0.7));
+      }, stepMs * i));
+    });
+  }
+
+  // ---- Command bar ----
+  var form = document.getElementById("commandForm");
+  var input = document.getElementById("command");
+  if (form) {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var cmd = (input.value || "").trim();
+      // Extract a project name: prefer "for <name>", else "project (called) <name>".
+      var project = "New client project";
+      var m = cmd.match(/\bfor\s+(.+)$/i) ||
+              cmd.match(/\bproject\s+(?:called\s+|named\s+)?(.+)$/i) ||
+              cmd.match(/\bclient\s+(.+)$/i);
+      if (m && m[1]) {
+        var name = m[1].replace(/^(?:the\s+)?(?:project|client)\s+/i, "").replace(/[."]+$/, "").trim();
+        if (name) project = name;
+      }
+      runDemo(project);
+      input.value = "";
+      input.blur();
+    });
+  }
+
+  document.getElementById("runDemo").addEventListener("click", function () { runDemo("New client project"); });
+  document.getElementById("resetDemo").addEventListener("click", function () { resetAll(false); });
+
+  // ---- Workspace modal ----
+  var modal = document.getElementById("agentModal");
+  var mFace = document.getElementById("modalFace");
+  var mName = document.getElementById("modalName");
+  var mRole = document.getElementById("modalRole");
+  var mPers = document.getElementById("modalPersonality");
+  var mCaps = document.getElementById("modalCaps");
+  var mAnim = document.getElementById("modalAnim");
+  var lastFocused = null;
+
+  function openModal(id) {
+    var a = AGENTS[id];
+    if (!a) return;
+    lastFocused = document.activeElement;
+    modal.style.setProperty("--accent", a.accent);
+    mFace.textContent = a.face;
+    mName.textContent = a.name;
+    mRole.textContent = a.role;
+    mPers.textContent = a.personality;
+    mAnim.textContent = "Animation: " + a.anim;
+    mCaps.innerHTML = "";
+    a.caps.forEach(function (c) {
+      var li = document.createElement("li");
+      li.textContent = c;
+      mCaps.appendChild(li);
+    });
+    modal.hidden = false;
+    var closeBtn = modal.querySelector(".agent-modal-close");
+    if (closeBtn) closeBtn.focus();
+  }
+  function closeModal() {
+    modal.hidden = true;
+    if (lastFocused && lastFocused.focus) lastFocused.focus();
+  }
+
+  Object.keys(cards).forEach(function (id) {
+    cards[id].addEventListener("click", function () { openModal(id); });
+  });
+  modal.addEventListener("click", function (e) {
+    if (e.target.hasAttribute("data-close")) closeModal();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !modal.hidden) closeModal();
+  });
+})();
