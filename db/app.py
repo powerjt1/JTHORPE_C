@@ -59,6 +59,34 @@ def init_db():
         _conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_accounts_email ON accounts(lower(email))"
         )
+        _conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS projects (
+                id          TEXT PRIMARY KEY,
+                name        TEXT NOT NULL,
+                owner_email TEXT NOT NULL,
+                status      TEXT NOT NULL,
+                created_at  TEXT NOT NULL
+            )
+            """
+        )
+        _conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS tasks (
+                id          TEXT PRIMARY KEY,
+                project_id  TEXT NOT NULL,
+                agent       TEXT NOT NULL,
+                phase       INTEGER NOT NULL,
+                phase_name  TEXT,
+                order_index INTEGER NOT NULL,
+                status      TEXT NOT NULL,
+                message     TEXT
+            )
+            """
+        )
+        _conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_tasks_project ON tasks(project_id)"
+        )
         _conn.commit()
 
 
@@ -125,6 +153,90 @@ def mark_verified(email):
         return cur.rowcount
 
 
+# ---- projects & tasks ----
+
+def task_row_to_dict(row):
+    return {
+        "id": row["id"],
+        "projectId": row["project_id"],
+        "agent": row["agent"],
+        "phase": row["phase"],
+        "phaseName": row["phase_name"],
+        "orderIndex": row["order_index"],
+        "status": row["status"],
+        "message": row["message"],
+    }
+
+
+def project_row_to_dict(row, tasks=None):
+    d = {
+        "id": row["id"],
+        "name": row["name"],
+        "ownerEmail": row["owner_email"],
+        "status": row["status"],
+        "createdAt": row["created_at"],
+    }
+    if tasks is not None:
+        d["tasks"] = tasks
+    return d
+
+
+def create_project(p):
+    with _lock:
+        _conn.execute(
+            "INSERT INTO projects (id, name, owner_email, status, created_at) VALUES (?, ?, ?, ?, ?)",
+            (p["id"], p["name"], p.get("ownerEmail"), p.get("status", "active"), p.get("createdAt", now_iso())),
+        )
+        _conn.commit()
+
+
+def update_project(pid, status):
+    with _lock:
+        cur = _conn.execute("UPDATE projects SET status = ? WHERE id = ?", (status, pid))
+        _conn.commit()
+        return cur.rowcount
+
+
+def create_task(t):
+    with _lock:
+        _conn.execute(
+            "INSERT INTO tasks (id, project_id, agent, phase, phase_name, order_index, status, message) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (t["id"], t["projectId"], t["agent"], t["phase"], t.get("phaseName"),
+             t["orderIndex"], t.get("status", "queued"), t.get("message", "")),
+        )
+        _conn.commit()
+
+
+def update_task(tid, status, message):
+    with _lock:
+        cur = _conn.execute(
+            "UPDATE tasks SET status = ?, message = ? WHERE id = ?", (status, message, tid)
+        )
+        _conn.commit()
+        return cur.rowcount
+
+
+def get_project(pid):
+    with _lock:
+        prow = _conn.execute("SELECT * FROM projects WHERE id = ?", (pid,)).fetchone()
+        if prow is None:
+            return None
+        trows = _conn.execute(
+            "SELECT * FROM tasks WHERE project_id = ? ORDER BY order_index ASC", (pid,)
+        ).fetchall()
+        return project_row_to_dict(prow, [task_row_to_dict(r) for r in trows])
+
+
+def list_projects(email):
+    with _lock:
+        rows = _conn.execute(
+            "SELECT * FROM projects WHERE lower(owner_email) = lower(?) ORDER BY created_at DESC",
+            (email,),
+        ).fetchall()
+        return [project_row_to_dict(r) for r in rows]
+
+
 class Handler(BaseHTTPRequestHandler):
     def _send(self, status, payload):
         body = json.dumps(payload).encode("utf-8")
@@ -161,6 +273,18 @@ class Handler(BaseHTTPRequestHandler):
             if not email:
                 return self._send(400, {"error": "email required"})
             return self._send(200, {"account": get_by_email(email)})
+        if parsed.path == "/projects/get":
+            qs = parse_qs(parsed.query)
+            pid = (qs.get("id") or [""])[0]
+            if not pid:
+                return self._send(400, {"error": "id required"})
+            return self._send(200, {"project": get_project(pid)})
+        if parsed.path == "/projects/list":
+            qs = parse_qs(parsed.query)
+            email = (qs.get("email") or [""])[0]
+            if not email:
+                return self._send(400, {"error": "email required"})
+            return self._send(200, {"projects": list_projects(email)})
         return self._send(404, {"error": "not found"})
 
     def do_POST(self):
@@ -181,6 +305,28 @@ class Handler(BaseHTTPRequestHandler):
             if not email:
                 return self._send(400, {"error": "email required"})
             return self._send(200, {"updated": mark_verified(email)})
+        if parsed.path == "/projects/create":
+            try:
+                create_project(data)
+                return self._send(200, {"ok": True})
+            except (KeyError, sqlite3.Error) as e:
+                return self._send(400, {"error": str(e)})
+        if parsed.path == "/projects/update":
+            pid = data.get("id")
+            if not pid:
+                return self._send(400, {"error": "id required"})
+            return self._send(200, {"updated": update_project(pid, data.get("status", "active"))})
+        if parsed.path == "/tasks/create":
+            try:
+                create_task(data)
+                return self._send(200, {"ok": True})
+            except (KeyError, sqlite3.Error) as e:
+                return self._send(400, {"error": str(e)})
+        if parsed.path == "/tasks/update":
+            tid = data.get("id")
+            if not tid:
+                return self._send(400, {"error": "id required"})
+            return self._send(200, {"updated": update_task(tid, data.get("status"), data.get("message", ""))})
         return self._send(404, {"error": "not found"})
 
     def log_message(self, fmt, *args):  # quieter logs

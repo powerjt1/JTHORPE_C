@@ -10,6 +10,11 @@
   var reduceMotion = window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Phase 1: when a deployed backend is available and the visitor is signed in,
+  // the room is driven by real, backend-tracked project state. Otherwise it
+  // runs the local scripted demo. A deployer sets window.AIOS_CONFIG.
+  var CONFIG = Object.assign({ authBaseUrl: "", backendEnabled: false }, window.AIOS_CONFIG || {});
+
   var AGENTS = {
     lucy: {
       name: "Lucy", role: "AI Orchestrator", face: "🎯", accent: "#7c5cff",
@@ -159,6 +164,85 @@
     });
   }
 
+  // ---- Backend-driven (live) project ----
+  var liveStatus = {}; // taskId -> last seen status (for delta logging)
+
+  function apiFetch(path, options) {
+    var base = (CONFIG.authBaseUrl || "").replace(/\/$/, "");
+    return fetch(base + path, Object.assign({
+      credentials: "include",
+      headers: { "Content-Type": "application/json" }
+    }, options || {}));
+  }
+
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function renderState(project) {
+    projectName.textContent = project.name;
+    var tasks = project.tasks || [];
+    var doneCount = tasks.filter(function (t) { return t.status === "done"; }).length;
+    var anyActive = tasks.some(function (t) { return t.status === "active"; });
+    progressBar.style.width = tasks.length ? Math.round((doneCount / tasks.length) * 100) + "%" : "0";
+
+    tasks.forEach(function (t) {
+      // phase board
+      setPhase(t.phase, t.status === "queued" ? "idle" : t.status);
+      // avatar
+      var state = "idle";
+      if (t.status === "active") state = (t.agent === "lucy") ? "speaking" : "active";
+      else if (t.status === "done") state = "done";
+      else state = anyActive ? "listening" : "idle";
+      setAvatarState(t.agent, state);
+      // delta log
+      if (liveStatus[t.id] !== t.status && t.message &&
+          (t.status === "active" || t.status === "done")) {
+        log(t.agent, t.message);
+      }
+      liveStatus[t.id] = t.status;
+    });
+  }
+
+  async function runBackendProject(name) {
+    resetAll(false);
+    liveStatus = {};
+    projectName.textContent = name;
+    var stepMs = reduceMotion ? 150 : 1100;
+
+    var project;
+    try {
+      var res = await apiFetch("/projects", { method: "POST", body: JSON.stringify({ name: name }) });
+      if (res.status === 401) {
+        log("lucy", "Sign in to run a live project — showing the demo instead.");
+        return runDemo(name);
+      }
+      if (!res.ok) throw new Error("create failed");
+      project = (await res.json()).project;
+    } catch (e) {
+      log("lucy", "Backend unavailable — showing the demo instead.");
+      return runDemo(name);
+    }
+
+    renderState(project);
+    while (project && project.status !== "complete") {
+      await sleep(stepMs);
+      try {
+        var tick = await apiFetch("/projects/" + project.id + "/tick", { method: "POST" });
+        if (!tick.ok) break;
+        project = (await tick.json()).project;
+        renderState(project);
+      } catch (e) { break; }
+    }
+    if (project && project.status === "complete") {
+      log("lucy", "✅ Project ready. Everything's tested, secured, and live.");
+      setAvatarState("lucy", "active");
+    }
+  }
+
+  function startProject(name) {
+    if (CONFIG.backendEnabled) return runBackendProject(name);
+    return runDemo(name);
+  }
+
   // ---- Command bar ----
   var form = document.getElementById("commandForm");
   var input = document.getElementById("command");
@@ -175,12 +259,13 @@
         var name = m[1].replace(/^(?:the\s+)?(?:project|client)\s+/i, "").replace(/[."]+$/, "").trim();
         if (name) project = name;
       }
-      runDemo(project);
+      startProject(project);
       input.value = "";
       input.blur();
     });
   }
 
+  // The demo button always runs the local scripted sequence.
   document.getElementById("runDemo").addEventListener("click", function () { runDemo("New client project"); });
   document.getElementById("resetDemo").addEventListener("click", function () { resetAll(false); });
 

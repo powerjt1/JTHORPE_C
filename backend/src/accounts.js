@@ -14,6 +14,7 @@
  */
 
 var config = require("./config").config;
+var bridgeFetch = require("./bridge").bridgeFetch;
 
 // ---------------------------------------------------------------------------
 // In-memory backend
@@ -65,18 +66,6 @@ var memory = {
 // ---------------------------------------------------------------------------
 // Remote backend (Python SQLite bridge)
 // ---------------------------------------------------------------------------
-async function bridgeFetch(path, options) {
-  var url = config.dbBridgeUrl.replace(/\/$/, "") + path;
-  var headers = Object.assign({ "Content-Type": "application/json" }, (options && options.headers) || {});
-  if (config.dbToken) headers["X-DB-Token"] = config.dbToken;
-  var res = await fetch(url, Object.assign({}, options, { headers: headers }));
-  var data = await res.json().catch(function () { return {}; });
-  if (!res.ok) {
-    throw new Error("db bridge " + path + " failed (" + res.status + "): " + (data.error || ""));
-  }
-  return data;
-}
-
 var remote = {
   async findOrCreate(profile) {
     var data = await bridgeFetch("/accounts/find-or-create", {

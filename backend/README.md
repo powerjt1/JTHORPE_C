@@ -35,7 +35,16 @@ from the signed transaction cookie.
 | POST | `/auth/logout` | Clear the session cookie |
 | POST | `/email/trial` | Email-fallback sign-up: create trial + send welcome |
 | POST | `/email/resend` | Re-send the welcome email to the signed-in user |
+| POST | `/projects` | Create a backend-tracked AIOS project + seed 8 tasks (auth) |
+| GET | `/projects` | List the signed-in user's projects |
+| GET | `/projects/:id` | Get a project + its tasks (owner only) |
+| POST | `/projects/:id/tick` | Advance the orchestration one step (owner only) |
 | GET | `/healthz` | Liveness + which providers/email transport are configured |
+
+The `/projects/*` routes power the **AIOS mission-control room** (`aios.html`)
+in live mode — see [`../docs/avatar-system.md`](../docs/avatar-system.md).
+Projects and tasks persist via the same account store (`memory` or the `db/`
+bridge).
 
 ## Email (Gmail or Outlook)
 

@@ -69,15 +69,38 @@ An AI mission-control room:
 
 - **Phase 0 — Concept demo (done):** `aios.html` — animated states + scripted
   orchestration, no backend. Great for pitching clients.
-- **Phase 1 — Live orchestration:** wire the room to the real backend so Lucy
-  routes to actual agents; stream state over WebSockets/SignalR; keep 2D/CSS
-  avatars. Activity log reflects real task results.
+- **Phase 1 — Live orchestration (available):** the room can be driven by the
+  real backend. A signed-in visitor's command creates a **backend-tracked
+  project** with one task per specialist; the board, avatars, and activity log
+  render from persisted server state as each task advances. Task "results" are
+  backend status messages for now (real Power Platform execution is Phase 4).
+  Currently the frontend drives progression by polling `/projects/:id/tick`;
+  swapping that for WebSockets/SignalR push is a drop-in later.
 - **Phase 2 — Voice:** Azure Speech STT for commands + TTS per-avatar voices.
 - **Phase 3 — 3D avatars:** Three.js/Babylon + Ready Player Me; Audio2Face
   lip-sync driven by the TTS audio.
 - **Phase 4 — Real execution:** specialists perform real Power Platform work
   through Nexus (environments, apps, dashboards, tests, security scans), with
   human-in-the-loop approval for anything sensitive.
+
+## Enabling live mode
+
+The room ships in **demo mode** (scripted, no backend). To drive it from the
+backend instead, set a config global before `js/aios.js` loads — e.g. add to
+`aios.html`:
+
+```html
+<script>window.AIOS_CONFIG = { authBaseUrl: "", backendEnabled: true };</script>
+```
+
+- `authBaseUrl` — base URL of the deployed auth/projects backend (`""` = same
+  origin, e.g. when the backend serves the site with `SERVE_STATIC=true`).
+- The visitor must be **signed in** (the `lucy_session` cookie from OAuth or the
+  email trial); otherwise the room falls back to the scripted demo.
+
+Backend endpoints (in `backend/routes/projects.js`): `POST /projects`,
+`GET /projects`, `GET /projects/:id`, `POST /projects/:id/tick`. Projects and
+their tasks persist via the account store (`memory` or the `db/` SQLite bridge).
 
 ## Design & implementation notes
 
