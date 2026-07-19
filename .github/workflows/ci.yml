@@ -46,6 +46,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Validate the prompt library (every agent well-formed)
+        working-directory: kernel
+        run: python -m motherbridge validate
+
       - name: MotherBridge kernel tests (stdlib only)
         working-directory: kernel
         run: python -m unittest discover -s tests -v

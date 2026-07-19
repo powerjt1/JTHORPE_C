@@ -62,6 +62,27 @@ authored from [`_TEMPLATE.md`](./_TEMPLATE.md):
 12. Escalation Rules · 13. Reporting Templates · 14. Definition of Done ·
 15. Continuous Learning · 16. Version History
 
+## Adding a new agent
+
+Adding an agent is just adding a well-formed `MB-0NN-<name>.md` file — the kernel
+auto-discovers it and CI validates it. Easiest path is the CLI:
+
+```bash
+cd kernel
+# scaffold the next-numbered agent from the 16-section template:
+python3 -m motherbridge new --name "Zoe" --title "Localization Architect"
+# -> creates docs/motherbridge/prompts/MB-011-zoe.md
+
+# fill in the sections, then check it:
+python3 -m motherbridge validate        # every agent must pass
+python3 -m motherbridge list            # shows id, version, title
+```
+
+Then commit the file. No code changes needed: `PromptLibrary` globs `MB-*.md`, so
+the new agent appears in the kernel, registry, and routing automatically. CI runs
+`motherbridge validate` on every push, so a malformed agent fails the build. (You
+can also copy [`_TEMPLATE.md`](./_TEMPLATE.md) by hand instead of the CLI.)
+
 ## Roadmap
 
 **Phase 1 — Core system prompts (this directory):** MB-001 … MB-010. ✅ started

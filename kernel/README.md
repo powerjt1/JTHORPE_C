@@ -31,6 +31,21 @@ task = k.dispatch("project-123", "design the solution architecture")
 print(task.agent_id)                # MB-002  (routed to Julian)
 ```
 
+## Add / validate / list agents (CLI)
+
+Adding an agent to the library is one command — the kernel auto-discovers the file.
+
+```bash
+python3 -m motherbridge new --name "Zoe" --title "Localization Architect"
+python3 -m motherbridge validate          # every agent must be well-formed
+python3 -m motherbridge list              # id, version, title
+```
+
+`new` scaffolds the next-numbered `MB-0NN-<name>.md` from the 16-section standard;
+fill it in and commit. `validate` also runs in CI, so a malformed agent fails the
+build. (Installed via `pip install .`, the same commands are available as the
+`motherbridge` console script.)
+
 ## Run the tests
 
 ```bash
