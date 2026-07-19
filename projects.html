@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Projects — Lucy AI</title>
+  <meta name="description" content="Your Lucy AI mission-control projects — status, progress, and history." />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/aios.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Lucy AI home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32" role="img" aria-hidden="true">
+            <defs>
+              <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#7c5cff" />
+                <stop offset="1" stop-color="#22d3ee" />
+              </linearGradient>
+            </defs>
+            <rect x="2" y="2" width="28" height="28" rx="9" fill="url(#lg)" />
+            <path d="M11 9v11h8" fill="none" stroke="#0b1020" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="21" cy="11" r="2.2" fill="#0b1020" />
+          </svg>
+        </span>
+        <span class="brand-name">Lucy<span class="brand-accent">AI</span></span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-menu" id="nav-menu">
+          <li><a href="index.html#services">Services</a></li>
+          <li><a href="team.html">Team</a></li>
+          <li><a href="aios.html">AIOS</a></li>
+          <li><a href="projects.html" aria-current="page">Projects</a></li>
+          <li><a href="signup.html" class="btn btn-nav">Start free trial</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="section">
+      <div class="container">
+        <header class="section-head" style="text-align:left;margin-bottom:28px;">
+          <p class="eyebrow">Mission control</p>
+          <h1 style="font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-0.02em;margin:6px 0 8px;">My projects</h1>
+          <p class="section-sub" style="margin:0;">Every project Lucy and the team have run for you.</p>
+        </header>
+
+        <!-- States (JS toggles visibility) -->
+        <div id="stateLoading" class="mc-state">Loading your projects…</div>
+
+        <div id="stateSignedOut" class="mc-state" hidden>
+          <div class="mc-empty-card">
+            <div class="mc-empty-icon">🔒</div>
+            <h2>Sign in to see your projects</h2>
+            <p>Start a free trial and connect your account to run and track projects.</p>
+            <p>
+              <a href="signup.html" class="btn btn-primary">Start free trial</a>
+              <a href="aios.html" class="btn btn-ghost">Try the demo</a>
+            </p>
+          </div>
+        </div>
+
+        <div id="stateEmpty" class="mc-state" hidden>
+          <div class="mc-empty-card">
+            <div class="mc-empty-icon">🚀</div>
+            <h2>No projects yet</h2>
+            <p>Head to mission control and tell Lucy to start your first project.</p>
+            <p><a href="aios.html" class="btn btn-primary">Open mission control</a></p>
+          </div>
+        </div>
+
+        <div id="stateError" class="mc-state" hidden>
+          <div class="mc-empty-card">
+            <div class="mc-empty-icon">⚠️</div>
+            <h2>Couldn't load projects</h2>
+            <p id="errorMsg">Something went wrong. Please try again.</p>
+            <p><button type="button" class="btn btn-ghost" id="retryBtn">Retry</button></p>
+          </div>
+        </div>
+
+        <!-- List -->
+        <div class="proj-list" id="projList" hidden></div>
+
+        <!-- Detail -->
+        <div class="proj-detail" id="projDetail" hidden>
+          <button type="button" class="btn btn-ghost" id="backBtn">← Back to projects</button>
+          <div class="mc-board" style="margin-top:16px;">
+            <header class="mc-board-head">
+              <h2 id="detailName">Project</h2>
+              <span class="mc-project" id="detailStatus"></span>
+            </header>
+            <div class="mc-progress"><div class="mc-progress-bar" id="detailProgress"></div></div>
+            <ol class="mc-phases" id="detailPhases"></ol>
+          </div>
+          <p style="margin-top:16px;">
+            <button type="button" class="btn btn-primary" id="resumeBtn" hidden>▶ Resume project</button>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <p>&copy; <span id="year">2026</span> Lucy AI. All rights reserved.</p>
+      <p class="powered">
+        Powered by
+        <a href="https://jabbnetworks.com" target="_blank" rel="noopener noreferrer">JABB&nbsp;Networks</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Runtime config (served by the backend in live mode; 404 -> signed-out). -->
+  <script src="aios-config.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/projects.js" defer></script>
+</body>
+</html>

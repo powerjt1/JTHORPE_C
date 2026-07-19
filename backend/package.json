@@ -1,0 +1,21 @@
+{
+  "name": "lucy-ai-auth-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OAuth (Microsoft + Google) sign-in backend for the Lucy AI free-trial sign-up. Scaffold — deploy with real credentials.",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node test/auth.test.js && node test/email.test.js && node test/verify.test.js && node test/projects.test.js",
+    "test:remote": "node test/projects.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2"
+  }
+}
