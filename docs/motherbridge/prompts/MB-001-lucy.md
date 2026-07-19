@@ -117,4 +117,5 @@ security/governance → #9 · product/CX → #10.
 - Adopts new agent capabilities as they register with the kernel.
 
 ## 16. Version History
+- v1.1.0 — 2026-07-19 — version aligned with the specialist prompts (no content change).
 - v1.0.0 — 2026-07-19 — initial system prompt (Phase 1).

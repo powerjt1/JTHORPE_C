@@ -1,8 +1,11 @@
 # MotherBridge Prompt Library
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Company:** JABBNETWORKS LLC
 **Product:** JABBNETWORKS AIOS Enterprise
+**Kernel implementation:** Python 3.11+ (FastAPI) — see the
+[Kernel Specification](./specs/KERNEL-SPEC.md) and the reference package in
+[`/kernel`](../../kernel/).
 
 > Internal system-of-record for the enterprise AI agent prompts and the
 > MotherBridge kernel. Not published on the public site. No secrets — reference
@@ -64,10 +67,13 @@ authored from [`_TEMPLATE.md`](./_TEMPLATE.md):
 **Phase 1 — Core system prompts (this directory):** MB-001 … MB-010. ✅ started
 
 **Version 2 — Platform specifications:**
-MotherBridge Kernel Specification · Shared Memory Engine · Agent-to-Agent
-Communication Protocol · Prompt Version Manager · Event Bus Specification ·
-Voice Integration Specification · Plugin SDK · API Standards · Coding Standards ·
-Enterprise Development Standards.
+[MotherBridge Kernel Specification](./specs/KERNEL-SPEC.md) ✅ · Shared Memory
+Engine · Agent-to-Agent Communication Protocol · Prompt Version Manager · Event
+Bus Specification · Voice Integration Specification · Plugin SDK · API Standards ·
+Coding Standards · Enterprise Development Standards.
+
+The kernel is implemented in **Python**; a reference package lives in
+[`/kernel`](../../kernel/) and already loads these prompt files.
 
 **Version 3 — Enterprise standards:**
 Enterprise Architecture Bible · AIOS UI Design System · Dataverse Standards ·
