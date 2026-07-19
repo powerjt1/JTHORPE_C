@@ -15,17 +15,38 @@
   var menu = document.getElementById("nav-menu");
 
   if (toggle && menu) {
-    toggle.addEventListener("click", function () {
-      var open = menu.classList.toggle("open");
+    var setOpen = function (open) {
+      menu.classList.toggle("open", open);
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+
+    // The button toggles the menu open/closed.
+    toggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      setOpen(!menu.classList.contains("open"));
     });
 
-    // Close menu after tapping a link (mobile)
+    // Close after tapping a link.
     menu.addEventListener("click", function (e) {
-      if (e.target.closest("a")) {
-        menu.classList.remove("open");
-        toggle.setAttribute("aria-expanded", "false");
+      if (e.target.closest("a")) setOpen(false);
+    });
+
+    // Close on Escape.
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && menu.classList.contains("open")) setOpen(false);
+    });
+
+    // Close when clicking/tapping outside the menu.
+    document.addEventListener("click", function (e) {
+      if (menu.classList.contains("open") &&
+          !menu.contains(e.target) && !toggle.contains(e.target)) {
+        setOpen(false);
       }
+    });
+
+    // Reset when resizing up to the desktop layout.
+    window.addEventListener("resize", function () {
+      if (window.innerWidth > 640) setOpen(false);
     });
   }
 
