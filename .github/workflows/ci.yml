@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Backend tests (memory store)
+        working-directory: backend
+        run: npm test
+
+      - name: Start Python DB bridge
+        run: |
+          DB_PATH=/tmp/ci.db DB_TOKEN=citoken python3 db/app.py &
+          for i in $(seq 1 20); do
+            curl -sf http://localhost:8799/healthz && break
+            sleep 0.5
+          done
+
+      - name: Projects test (remote SQLite bridge)
+        working-directory: backend
+        env:
+          ACCOUNTS_STORE: remote
+          DB_BRIDGE_URL: http://localhost:8799
+          DB_TOKEN: citoken
+        run: npm run test:remote
