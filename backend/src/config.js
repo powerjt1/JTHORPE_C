@@ -35,6 +35,10 @@ var config = {
   dbBridgeUrl: env("DB_BRIDGE_URL", "http://localhost:8799"),
   dbToken: env("DB_TOKEN", ""),
 
+  // When the backend serves the static site, expose /aios-config.js so the
+  // AIOS room + projects dashboard run in live (backend-driven) mode.
+  aiosLive: env("AIOS_LIVE", "true") === "true",
+
   providers: {
     microsoft: {
       label: "Microsoft",

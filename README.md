@@ -23,19 +23,30 @@ HTML, CSS, and vanilla JavaScript — deploy it anywhere.
 └── README.md
 ```
 
-## Run locally
+## Run the static site
 
 No build required. Open `index.html` directly, or serve the folder:
 
 ```bash
-# Python
-python3 -m http.server 8000
-
-# or Node
-npx serve .
+python3 -m http.server 8000   # then visit http://localhost:8000
 ```
 
-Then visit http://localhost:8000
+In this mode the AIOS room runs its scripted demo and the sign-up form is
+front-end only.
+
+## Run the full stack (site + backend + database)
+
+For live sign-in, email, and backend-tracked AIOS projects, run everything with
+Docker Compose:
+
+```bash
+cp .env.example .env      # set COOKIE_SECRET and DB_TOKEN
+docker compose up --build # then visit http://localhost:8787
+```
+
+See **[DEPLOY.md](DEPLOY.md)** for details, and
+[`backend/README.md`](backend/README.md) / [`db/README.md`](db/README.md) for the
+components.
 
 ## Deploy
 

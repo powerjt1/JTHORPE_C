@@ -1,0 +1,63 @@
+# Lucy AI — full stack: static site + Node backend + Python SQLite bridge.
+# One command:  docker compose up --build
+# Configure via a .env file next to this (see .env.example).
+
+services:
+  db:
+    build: ./db
+    environment:
+      DB_PATH: /data/lucy.db
+      PORT: "8799"
+      DB_TOKEN: ${DB_TOKEN:?set DB_TOKEN in .env}
+    volumes:
+      - dbdata:/data
+    restart: unless-stopped
+    # Not published to the host — only the app talks to it over the internal network.
+    expose:
+      - "8799"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "${APP_PORT:-8787}:8787"
+    environment:
+      PORT: "8787"
+      BASE_URL: ${BASE_URL:-http://localhost:8787}
+      COOKIE_SECRET: ${COOKIE_SECRET:?set COOKIE_SECRET in .env}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      SERVE_STATIC: "true"
+      AIOS_LIVE: ${AIOS_LIVE:-true}
+
+      # Persist accounts + projects in the SQLite bridge.
+      ACCOUNTS_STORE: remote
+      DB_BRIDGE_URL: http://db:8799
+      DB_TOKEN: ${DB_TOKEN:?set DB_TOKEN in .env}
+
+      # Post-auth / error destinations (default to same origin).
+      WELCOME_URL: ${WELCOME_URL:-http://localhost:8787/welcome.html}
+      SIGNUP_URL: ${SIGNUP_URL:-http://localhost:8787/signup.html}
+
+      # OAuth (optional — leave blank to keep SSO buttons showing "not connected").
+      MS_CLIENT_ID: ${MS_CLIENT_ID:-}
+      MS_CLIENT_SECRET: ${MS_CLIENT_SECRET:-}
+      MS_TENANT: ${MS_TENANT:-common}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+
+      # Email (optional — none|graph|gmail).
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-none}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-Lucy AI}
+      EMAIL_GRAPH_CLIENT_ID: ${EMAIL_GRAPH_CLIENT_ID:-}
+      EMAIL_GRAPH_CLIENT_SECRET: ${EMAIL_GRAPH_CLIENT_SECRET:-}
+      GMAIL_CLIENT_ID: ${GMAIL_CLIENT_ID:-}
+      GMAIL_CLIENT_SECRET: ${GMAIL_CLIENT_SECRET:-}
+      GMAIL_REFRESH_TOKEN: ${GMAIL_REFRESH_TOKEN:-}
+    restart: unless-stopped
+
+volumes:
+  dbdata:

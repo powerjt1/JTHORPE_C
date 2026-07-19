@@ -65,6 +65,16 @@ app.use("/projects", projectRoutes);
 
 // Optionally serve the static marketing site from the repo root.
 if (process.env.SERVE_STATIC === "true") {
+  // Runtime config for the AIOS room + projects dashboard. Because the backend
+  // is serving the site (same origin), enable live mode by default. When the
+  // site is hosted statically without a backend, this request 404s and the
+  // pages fall back to the scripted demo.
+  app.get("/aios-config.js", function (req, res) {
+    var cfg = { authBaseUrl: "", backendEnabled: config.aiosLive };
+    res.type("application/javascript");
+    res.send("window.AIOS_CONFIG = " + JSON.stringify(cfg) + ";");
+  });
+
   var siteRoot = path.resolve(__dirname, "..");
   app.use(express.static(siteRoot));
 }
