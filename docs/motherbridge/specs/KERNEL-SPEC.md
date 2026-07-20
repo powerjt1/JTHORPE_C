@@ -213,8 +213,8 @@ Alex/Brianna/Bianca → Julian; Ryan/Christina/MiaKkcar → JABBNETWORKS.
 ### 6.9 Plugin Manager, Voice Coordinator, Telemetry, Health
 - **PluginManager** — discover/load/verify plugins against the Plugin SDK
   contract (V2 doc).
-- **VoiceCoordinator** — manage Azure Speech STT/TTS sessions per agent voice
-  (Voice Integration Spec, V2).
+- **VoiceCoordinator** — manage Azure Speech STT/TTS sessions per agent voice;
+  full contract in the [Voice Integration Specification](./VOICE-INTEGRATION-SPEC.md).
 - **Telemetry** — structured events (latency, outcomes, cost) to the sink.
 - **HealthMonitor** — subsystem/connection health; emits `health.degraded`.
 

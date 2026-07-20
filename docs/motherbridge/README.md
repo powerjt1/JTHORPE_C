@@ -97,8 +97,9 @@ can also copy [`_TEMPLATE.md`](./_TEMPLATE.md) by hand instead of the CLI.)
 [Shared Memory Engine](./specs/SHARED-MEMORY-SPEC.md) ✅ ·
 [Agent-to-Agent Communication Protocol](./specs/A2A-PROTOCOL-SPEC.md) ✅ ·
 [Prompt Version Manager](./specs/PROMPT-VERSION-MANAGER-SPEC.md) ✅ ·
-[Event Bus Specification](./specs/EVENT-BUS-SPEC.md) ✅ · Voice
-Integration Specification · Plugin SDK · API Standards · Coding Standards ·
+[Event Bus Specification](./specs/EVENT-BUS-SPEC.md) ✅ ·
+[Voice Integration Specification](./specs/VOICE-INTEGRATION-SPEC.md) ✅ (design) ·
+Plugin SDK · API Standards · Coding Standards ·
 Enterprise Development Standards.
 
 The kernel is implemented in **Python**; a reference package lives in
