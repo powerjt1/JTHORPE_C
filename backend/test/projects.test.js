@@ -41,18 +41,19 @@ function ok(name, cond) { console.log((cond ? "PASS" : "FAIL") + " [" + MODE + "
 
   var cr = await fetch(BASE + "/projects", { method: "POST", headers: { "Content-Type": "application/json", cookie: cookie }, body: JSON.stringify({ name: "Acme Corp" }) });
   var project = (await cr.json()).project;
-  ok("create: 8 queued tasks", project.tasks.length === 8 && project.tasks.every(function (x) { return x.status === "queued"; }));
+  ok("create: 10 queued tasks", project.tasks.length === 10 && project.tasks.every(function (x) { return x.status === "queued"; }));
   ok("create: first is lucy/Orchestration", project.tasks[0].agent === "lucy" && project.tasks[0].phaseName === "Orchestration");
+  ok("create: last is miakkcar", project.tasks[9].agent === "miakkcar");
 
   var pid = project.id, proj = project, guard = 0, sawLucyActive = false;
-  while (proj.status !== "complete" && guard++ < 20) {
+  while (proj.status !== "complete" && guard++ < 24) {
     var tk = await fetch(BASE + "/projects/" + pid + "/tick", { method: "POST", headers: { cookie: cookie } });
     proj = (await tk.json()).project;
     if (proj.tasks[0].status === "active") sawLucyActive = true;
   }
   ok("project completes", proj.status === "complete");
   ok("lucy went active", sawLucyActive);
-  ok("sentinel done + message", proj.tasks[7].status === "done" && /compliant/i.test(proj.tasks[7].message));
+  ok("kaira security done + message", proj.tasks[8].agent === "kaira" && /compliant/i.test(proj.tasks[8].message));
   ok("all tasks done", proj.tasks.every(function (x) { return x.status === "done"; }));
 
   var t2 = await fetch(BASE + "/email/trial", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: uniq + "-other@acme.com" }) });

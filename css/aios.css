@@ -189,6 +189,19 @@
   border: 2px solid var(--accent);
   opacity: 0.25;
 }
+/* Uploaded portrait sits over the emoji glyph; if it 404s it's removed and the
+   emoji shows through (see onerror in the markup). */
+.avatar-img {
+  position: absolute;
+  z-index: 3;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
+}
+.modal-avatar .avatar-img { width: 68px; height: 68px; }
 
 /* Idle: gentle float */
 .agent-avatar[data-state="idle"] { animation: av-float 5s ease-in-out infinite; }
