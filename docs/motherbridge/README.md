@@ -100,7 +100,8 @@ can also copy [`_TEMPLATE.md`](./_TEMPLATE.md) by hand instead of the CLI.)
 [Event Bus Specification](./specs/EVENT-BUS-SPEC.md) ✅ ·
 [Voice Integration Specification](./specs/VOICE-INTEGRATION-SPEC.md) ✅ (design) ·
 [Plugin SDK](./specs/PLUGIN-SDK-SPEC.md) ✅ ·
-[API Standards](./specs/API-STANDARDS.md) ✅ · Coding Standards ·
+[API Standards](./specs/API-STANDARDS.md) ✅ ·
+[Coding Standards](./specs/CODING-STANDARDS.md) ✅ ·
 Enterprise Development Standards.
 
 The kernel is implemented in **Python**; a reference package lives in
