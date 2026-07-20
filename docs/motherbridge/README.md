@@ -99,7 +99,8 @@ can also copy [`_TEMPLATE.md`](./_TEMPLATE.md) by hand instead of the CLI.)
 [Prompt Version Manager](./specs/PROMPT-VERSION-MANAGER-SPEC.md) ✅ ·
 [Event Bus Specification](./specs/EVENT-BUS-SPEC.md) ✅ ·
 [Voice Integration Specification](./specs/VOICE-INTEGRATION-SPEC.md) ✅ (design) ·
-[Plugin SDK](./specs/PLUGIN-SDK-SPEC.md) ✅ · API Standards · Coding Standards ·
+[Plugin SDK](./specs/PLUGIN-SDK-SPEC.md) ✅ ·
+[API Standards](./specs/API-STANDARDS.md) ✅ · Coding Standards ·
 Enterprise Development Standards.
 
 The kernel is implemented in **Python**; a reference package lives in

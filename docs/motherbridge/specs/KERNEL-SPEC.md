@@ -249,7 +249,8 @@ class MemoryRecord: scope: str; kind: str; data: dict; ts: str
 | POST | `/kernel/route` | Resolve an intent to an agent |
 | POST | `/kernel/events` | Publish an event |
 
-All mutating endpoints pass through the PolicyEngine and are audited.
+All mutating endpoints pass through the PolicyEngine and are audited. Every surface
+follows the [API Standards](./API-STANDARDS.md) (envelope, error shape, versioning, auth).
 
 ## 9. Lifecycle
 
