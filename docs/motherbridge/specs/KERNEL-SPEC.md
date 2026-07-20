@@ -142,7 +142,8 @@ Backends: `InMemoryStore` (dev) and `SqliteStore(db_path)` (persistent); same
 semantics, swappable.
 
 ### 6.4 Event Bus
-Decoupled pub/sub for agent-to-agent coordination.
+Decoupled pub/sub for agent-to-agent coordination. Full contract in the
+[Event Bus Specification](./EVENT-BUS-SPEC.md).
 ```python
 class EventBus:
     def subscribe(self, topic: str, handler: Callable[[Event], None]) -> None: ...
