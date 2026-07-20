@@ -14,6 +14,7 @@ var router = express.Router();
 
 var projects = require("../src/projects");
 var roster = require("../src/roster");
+var metrics = require("../src/metrics");
 
 var SESSION_COOKIE = "lucy_session";
 
@@ -54,6 +55,11 @@ router.get("/", async function (req, res) {
       .slice(0, 6)
       .map(function (t) { return { agent: t.agent, message: t.message, at: t.updatedAt }; });
 
+    var metricsSnap = metrics.snapshot({
+      completedProjects: completed.length,
+      securityScore: 100
+    });
+
     return res.json({
       ok: true,
       live: true,
@@ -65,8 +71,15 @@ router.get("/", async function (req, res) {
         agentsOnline: roster.length,
         agentsTotal: roster.length,
         tasksDone: done.length,
-        successRate: successRate
+        successRate: successRate,
+        // real runtime metrics
+        apiCalls: metricsSnap.apiCalls,
+        automationRuns: metricsSnap.automationRuns,
+        tokensEst: metricsSnap.tokensEst,
+        deployments: metricsSnap.deployments,
+        securityScore: metricsSnap.securityScore
       },
+      metrics: metricsSnap,
       health: { onTrack: active.length, atRisk: 0, delayed: 0, completed: completed.length },
       workload: workload,
       timeline: timeline

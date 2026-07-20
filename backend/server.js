@@ -18,6 +18,8 @@ var authRoutes = require("./routes/auth");
 var emailRoutes = require("./routes/email");
 var projectRoutes = require("./routes/projects");
 var dashboardRoutes = require("./routes/dashboard");
+var agentRoutes = require("./routes/agents");
+var metrics = require("./src/metrics");
 
 if (!config.cookieSecret) {
   // Fail fast: signed cookies are required for state/PKCE and the session.
@@ -59,11 +61,18 @@ app.get("/healthz", function (req, res) {
   });
 });
 
-// OAuth + email + projects
+// Count real API calls (the app endpoints, not static assets).
+app.use(function (req, res, next) {
+  if (/^\/(auth|email|projects|dashboard|agents)\b/.test(req.path)) metrics.recordApiCall();
+  next();
+});
+
+// OAuth + email + projects + agents
 app.use("/auth", authRoutes);
 app.use("/email", emailRoutes);
 app.use("/projects", projectRoutes);
 app.use("/dashboard", dashboardRoutes);
+app.use("/agents", agentRoutes);
 
 // Optionally serve the static marketing site from the repo root.
 if (process.env.SERVE_STATIC === "true") {

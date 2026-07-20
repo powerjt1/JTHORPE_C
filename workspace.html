@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agents Workspace — JABBNETWORKS AIOS</title>
+  <meta name="description" content="The JABBNETWORKS AIOS Agents Workspace — a live canvas of the AI team working on the fly. Click an agent to ask questions and watch the scope and file exchange animate in real time. Powered by JABB Networks." />
+  <meta name="theme-color" content="#0b1020" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/aios.css" />
+  <link rel="stylesheet" href="css/workspace.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Lucy AI home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32" role="img" aria-hidden="true">
+            <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+            <rect x="2" y="2" width="28" height="28" rx="9" fill="url(#lg)"/>
+            <path d="M11 9v11h8" fill="none" stroke="#0b1020" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="21" cy="11" r="2.2" fill="#0b1020"/>
+          </svg>
+        </span>
+        <span class="brand-name">Lucy<span class="brand-accent">AI</span></span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+        <ul class="nav-menu" id="nav-menu">
+          <li><a href="team.html">Team</a></li>
+          <li><a href="aios.html">AIOS</a></li>
+          <li><a href="workspace.html" aria-current="page">Workspace</a></li>
+          <li><a href="command-center.html">Command Center</a></li>
+          <li><a href="signup.html" class="btn btn-nav">Start free trial</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="ws">
+    <div class="container">
+      <header class="ws-titlebar">
+        <div>
+          <p class="eyebrow">JABBNETWORKS AIOS <span class="demo-badge" id="wsMode">Live canvas</span></p>
+          <h1>Agents Workspace</h1>
+          <p class="ws-lede">The team, working on the fly. Watch scope and files move down the pipeline —
+            click any agent to open its console, ask a question, and see the file exchange animate.</p>
+        </div>
+        <div class="cc-live"><span class="cc-dot"></span> LIVE · <span id="wsClock">10:30 AM</span></div>
+      </header>
+
+      <div class="ws-grid">
+        <!-- Live canvas -->
+        <section class="ws-stage-wrap" aria-label="Agent canvas">
+          <div class="ws-stage" id="wsStage">
+            <svg class="ws-wires" id="wsWires" aria-hidden="true"></svg>
+            <!-- agent nodes injected by JS -->
+          </div>
+          <div class="ws-flowbar">
+            <span class="ws-flow-dot"></span>
+            <span id="wsFlowMsg">Pipeline flowing — artifacts handed agent → agent.</span>
+          </div>
+        </section>
+
+        <!-- Agent console -->
+        <aside class="ws-console" id="wsConsole" aria-live="polite">
+          <div class="ws-console-empty" id="wsEmpty">
+            <div class="ws-console-empty-mark">🗂️</div>
+            <h2>Open an agent console</h2>
+            <p>Click an agent on the canvas to see what they're working on, watch files flow through
+              their scope, and ask them a question.</p>
+          </div>
+
+          <div class="ws-console-body" id="wsBody" hidden>
+            <header class="ws-c-head">
+              <img id="wsAvatar" src="" alt="" />
+              <div>
+                <strong id="wsName">—</strong>
+                <em id="wsTitle">—</em>
+              </div>
+              <span class="ws-c-status" id="wsStatus">idle</span>
+            </header>
+
+            <!-- File-exchange animation: inputs -> agent -> outputs -->
+            <div class="ws-exchange" id="wsExchange">
+              <div class="ws-ex-col ws-ex-in">
+                <span class="ws-ex-label">Scope in</span>
+                <ul id="wsInputs"></ul>
+              </div>
+              <div class="ws-ex-core" aria-hidden="true">
+                <div class="ws-ex-agent" id="wsCore">⚙️</div>
+                <div class="ws-ex-track"><i class="ws-ex-packet" id="wsPacket"></i></div>
+              </div>
+              <div class="ws-ex-col ws-ex-out">
+                <span class="ws-ex-label">Delivers</span>
+                <ul id="wsOutputs"></ul>
+              </div>
+            </div>
+            <p class="ws-artifact">Hands off <code id="wsArtifact">—</code><span id="wsNext"></span></p>
+
+            <!-- Ask console -->
+            <div class="ws-chat" id="wsChat"></div>
+            <form class="ws-ask" id="wsAskForm">
+              <input id="wsAskInput" type="text" autocomplete="off"
+                     placeholder="Ask this agent about their work…" maxlength="500" />
+              <button type="submit" class="btn">Ask</button>
+            </form>
+            <p class="ws-note" id="wsSimNote" hidden>Grounded role-based reply — not a live model.
+              A real model connects via the MotherBridge kernel.</p>
+          </div>
+        </aside>
+      </div>
+
+      <p class="ws-foot-note">
+        The canvas reflects the 10-agent orchestration pipeline. In <strong>live mode</strong> engaged
+        agents and recent activity come from your real projects (<a href="command-center.html">Command Center</a>);
+        otherwise it runs an ambient demo. Start a run in the <a href="aios.html">AIOS room</a>.
+      </p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <p>&copy; <span id="year">2026</span> Lucy AI. All rights reserved.</p>
+      <p class="powered">
+        <img class="jabb-mark" src="assets/brand/jabbnetworks-logo.png" alt="JABB Networks" />
+        Powered by <a href="https://jabbnetworks.com" target="_blank" rel="noopener noreferrer">JABB&nbsp;Networks</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="aios-config.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/workspace.js" defer></script>
+</body>
+</html>

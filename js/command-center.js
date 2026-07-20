@@ -1,8 +1,9 @@
 /* =========================================================
    Lucy AI — AIOS Command Center
    Clock + live data. When a backend is available (window.AIOS_CONFIG)
-   and the visitor is signed in, project-derived metrics go live via
-   GET /dashboard. Infrastructure-style KPIs stay illustrative.
+   and the visitor is signed in, KPIs, health, workload, timeline, and the
+   system gauges go live via GET /dashboard (real counters + os/fs metrics).
+   AI Tokens are estimated from real automation runs.
    ========================================================= */
 (function () {
   "use strict";
@@ -33,10 +34,41 @@
     brianna: "Brianna", bianca: "Bianca", christina: "Christina", kaira: "Kaira", miakkcar: "MiaKkcar"
   };
 
+  function fmt(n) {
+    n = Number(n) || 0;
+    if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, "") + "M";
+    if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, "") + "k";
+    return String(n);
+  }
+  function set(id, v) { if (el(id)) el(id).textContent = v; }
+
   function renderKpis(k) {
-    if (el("kActiveProjects")) el("kActiveProjects").textContent = k.activeProjects;
-    if (el("kAgents")) el("kAgents").textContent = k.agentsOnline + "/" + k.agentsTotal;
-    if (el("kSuccess")) el("kSuccess").textContent = k.successRate + "%";
+    set("kActiveProjects", k.activeProjects);
+    set("kAgents", k.agentsOnline + "/" + k.agentsTotal);
+    set("kSuccess", k.successRate + "%");
+    if (k.automationRuns != null) set("kAutomationRuns", fmt(k.automationRuns));
+    if (k.apiCalls != null) set("kApiCalls", fmt(k.apiCalls));
+    if (k.securityScore != null) set("kSecurity", k.securityScore + "%");
+    if (k.deployments != null) set("kDeployments", k.deployments);
+    if (k.tokensEst != null) set("kTokens", fmt(k.tokensEst));
+    if (el("kActiveDelta")) el("kActiveDelta").textContent = (k.totalProjects || 0) + " total";
+    if (el("kRunsDelta")) el("kRunsDelta").textContent = (k.tasksDone || 0) + " tasks done";
+  }
+
+  function gauge(id, v, unit) {
+    var g = el(id);
+    if (!g) return;
+    v = Math.max(0, Math.min(100, Math.round(v)));
+    g.style.setProperty("--v", v);
+    var span = g.querySelector("span");
+    if (span) span.textContent = v + (unit || "%");
+  }
+  function renderGauges(sys) {
+    if (!sys) return;
+    gauge("gCpu", sys.cpu);
+    gauge("gMemory", sys.memory);
+    gauge("gStorage", sys.storage);
+    gauge("gLoad", sys.load);
   }
 
   function renderHealth(h) {
@@ -94,6 +126,7 @@
     if (!data || !data.ok) return;
     if (el("ccMode")) el("ccMode").textContent = "Live data";
     renderKpis(data.kpis);
+    renderGauges(data.metrics && data.metrics.system);
     renderHealth(data.health);
     renderWorkload(data.workload || []);
     renderTimeline(data.timeline || []);

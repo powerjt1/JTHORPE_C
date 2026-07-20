@@ -18,6 +18,7 @@ var router = express.Router();
 var crypto = require("crypto");
 
 var projects = require("../src/projects");
+var metrics = require("../src/metrics");
 
 var SESSION_COOKIE = "lucy_session";
 
@@ -65,6 +66,7 @@ router.post("/", async function (req, res) {
         phase: i, phaseName: PHASES[i].name, orderIndex: i, status: "queued", message: ""
       });
     }
+    metrics.recordProjectCreated();
     var full = await projects.getProject(id);
     return res.json({ ok: true, project: full });
   } catch (e) {
@@ -97,6 +99,7 @@ router.post("/:id/tick", async function (req, res) {
   if (!requireOwner(req, res, project)) return;
 
   try {
+    metrics.recordAutomationRun();
     var nowTs = new Date().toISOString();
     var active = project.tasks.find(function (t) { return t.status === "active"; });
     if (active) {

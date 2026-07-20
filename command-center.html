@@ -32,6 +32,7 @@
         <ul class="nav-menu" id="nav-menu">
           <li><a href="team.html">Team</a></li>
           <li><a href="aios.html">AIOS</a></li>
+          <li><a href="workspace.html">Workspace</a></li>
           <li><a href="command-center.html" aria-current="page">Command Center</a></li>
           <li><a href="signup.html" class="btn btn-nav">Start free trial</a></li>
         </ul>
@@ -52,14 +53,14 @@
 
       <!-- KPI tiles -->
       <section class="cc-kpis" aria-label="Key metrics">
-        <div class="cc-kpi"><span class="cc-kpi-label">Active Projects</span><span class="cc-kpi-value" id="kActiveProjects">12</span><span class="cc-kpi-delta up">+2 today</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">Active Projects</span><span class="cc-kpi-value" id="kActiveProjects">12</span><span class="cc-kpi-delta up" id="kActiveDelta">+2 today</span></div>
         <div class="cc-kpi"><span class="cc-kpi-label">AI Agents</span><span class="cc-kpi-value" id="kAgents">10/10</span><span class="cc-kpi-delta">All online</span></div>
-        <div class="cc-kpi"><span class="cc-kpi-label">Automation Runs</span><span class="cc-kpi-value">1,429</span><span class="cc-kpi-delta up">+15.3%</span></div>
-        <div class="cc-kpi"><span class="cc-kpi-label">Success Rate</span><span class="cc-kpi-value" id="kSuccess">98.7%</span><span class="cc-kpi-delta up">+2.1%</span></div>
-        <div class="cc-kpi"><span class="cc-kpi-label">API Calls</span><span class="cc-kpi-value">42,531</span><span class="cc-kpi-delta up">+18.7%</span></div>
-        <div class="cc-kpi"><span class="cc-kpi-label">Security Score</span><span class="cc-kpi-value">100%</span><span class="cc-kpi-delta">Excellent</span></div>
-        <div class="cc-kpi"><span class="cc-kpi-label">Deployments</span><span class="cc-kpi-value">23</span><span class="cc-kpi-delta">This week</span></div>
-        <div class="cc-kpi"><span class="cc-kpi-label">AI Tokens</span><span class="cc-kpi-value">2.4M</span><span class="cc-kpi-delta up">+21.6%</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">Automation Runs</span><span class="cc-kpi-value" id="kAutomationRuns">1,429</span><span class="cc-kpi-delta up" id="kRunsDelta">+15.3%</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">Success Rate</span><span class="cc-kpi-value" id="kSuccess">98.7%</span><span class="cc-kpi-delta up">tasks done</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">API Calls</span><span class="cc-kpi-value" id="kApiCalls">42,531</span><span class="cc-kpi-delta up">this session</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">Security Score</span><span class="cc-kpi-value" id="kSecurity">100%</span><span class="cc-kpi-delta">Excellent</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">Deployments</span><span class="cc-kpi-value" id="kDeployments">23</span><span class="cc-kpi-delta">completed</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">AI Tokens <span class="cc-est">est.</span></span><span class="cc-kpi-value" id="kTokens">2.4M</span><span class="cc-kpi-delta up">from runs</span></div>
       </section>
 
       <!-- Main grid -->
@@ -97,11 +98,11 @@
             <li><span>MiaKkcar</span><div class="cc-bar"><i style="width:70%"></i></div><b>70%</b></li>
           </ul>
           <header class="cc-card-head" style="margin-top:22px;"><h2>System performance</h2></header>
-          <div class="cc-gauges">
-            <div class="cc-gauge" style="--v:36;--c:#22d3ee"><span>36%</span><em>CPU</em></div>
-            <div class="cc-gauge" style="--v:62;--c:#7c5cff"><span>62%</span><em>Memory</em></div>
-            <div class="cc-gauge" style="--v:41;--c:#43e08a"><span>41%</span><em>Storage</em></div>
-            <div class="cc-gauge" style="--v:78;--c:#f59e0b"><span>78%</span><em>Network</em></div>
+          <div class="cc-gauges" id="ccGauges">
+            <div class="cc-gauge" id="gCpu" style="--v:36;--c:#22d3ee"><span>36%</span><em>CPU</em></div>
+            <div class="cc-gauge" id="gMemory" style="--v:62;--c:#7c5cff"><span>62%</span><em>Memory</em></div>
+            <div class="cc-gauge" id="gStorage" style="--v:41;--c:#43e08a"><span>41%</span><em>Storage</em></div>
+            <div class="cc-gauge" id="gLoad" style="--v:78;--c:#f59e0b"><span>78%</span><em>Load</em></div>
           </div>
         </section>
 
@@ -145,8 +146,10 @@
       </section>
 
       <p class="cc-note">
-        A concept dashboard for the JABBNETWORKS AIOS command center (Phase 4). Numbers are
-        illustrative. The live orchestration surface is the <a href="aios.html">AIOS room</a>.
+        In <strong>live mode</strong> the KPIs, project health, workload, timeline, and system
+        gauges are real — measured from this backend (projects, tasks, API calls, CPU/memory/storage).
+        AI Tokens are estimated from real automation runs. See agents working live in the
+        <a href="workspace.html">Workspace</a>; run projects in the <a href="aios.html">AIOS room</a>.
       </p>
     </div>
   </main>

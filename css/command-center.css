@@ -29,6 +29,7 @@
   padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 3px;
 }
 .cc-kpi-label { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.cc-est { font-size: 0.62rem; opacity: 0.65; text-transform: none; letter-spacing: 0; font-style: italic; }
 .cc-kpi-value { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
 .cc-kpi-delta { font-size: 0.75rem; color: var(--muted); }
 .cc-kpi-delta.up { color: #43e08a; }
