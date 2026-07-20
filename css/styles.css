@@ -599,6 +599,35 @@ section[id] { scroll-margin-top: 86px; }
 .welcome-help a { color: var(--brand-2); }
 .welcome-help a:hover { text-decoration: underline; }
 
+/* ---- Product showcase (Lucy box) ---- */
+.product-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 40px;
+  align-items: center;
+}
+.product-media {
+  display: flex; justify-content: center;
+  filter: drop-shadow(0 30px 60px rgba(0,0,0,0.55));
+}
+.product-media img { max-width: 100%; border-radius: var(--radius); }
+.product-copy h2 { font-size: clamp(1.6rem, 3.4vw, 2.3rem); letter-spacing: -0.02em; margin: 10px 0 12px; }
+
+/* ---- Office scene background band ---- */
+.office-bg {
+  background: linear-gradient(rgba(11,16,32,0.88), rgba(11,16,32,0.94)),
+              url("../assets/marketing/office.jpg") center/cover no-repeat;
+  border-block: 1px solid var(--border);
+}
+
+/* ---- JABB brand mark in footers ---- */
+.jabb-mark { height: 22px; width: auto; vertical-align: middle; margin-right: 8px; border-radius: 4px; }
+
+@media (max-width: 760px) {
+  .product-grid { grid-template-columns: 1fr; }
+  .product-media { order: -1; max-width: 360px; margin-inline: auto; }
+}
+
 /* ---- Steps ---- */
 .steps {
   list-style: none;
