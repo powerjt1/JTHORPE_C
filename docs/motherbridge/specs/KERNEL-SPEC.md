@@ -123,14 +123,19 @@ class PromptVersionManager:
 Current version = the highest SemVer in the prompt's Version History.
 
 ### 6.3 Shared Memory Engine
-Project-scoped key/value + records; append-only audit for reconstructable runs.
+Scoped key/value + an append-only audit log for reconstructable runs. Full
+contract in the [Shared Memory Engine Specification](./SHARED-MEMORY-SPEC.md).
 ```python
 class SharedMemory(Protocol):
     def put(self, scope: str, key: str, value: Any) -> None: ...
     def get(self, scope: str, key: str) -> Any | None: ...
+    def keys(self, scope: str) -> list[str]: ...
+    def delete(self, scope: str, key: str) -> bool: ...
     def append(self, scope: str, record: MemoryRecord) -> None: ...
     def history(self, scope: str) -> list[MemoryRecord]: ...
 ```
+Backends: `InMemoryStore` (dev) and `SqliteStore(db_path)` (persistent); same
+semantics, swappable.
 
 ### 6.4 Event Bus
 Decoupled pub/sub for agent-to-agent coordination.
@@ -258,7 +263,8 @@ All mutating endpoints pass through the PolicyEngine and are audited.
 - **0.1 (this doc + reference package):** Registry, Prompt Library + Version
   Manager, in-memory SharedMemory, in-process EventBus, Router, Policy stub,
   Health, FastAPI surface. Loads the real MB-0NN prompts.
-- **0.2:** SQLite/Dataverse memory, real approval flow, plugin discovery.
+- **0.2:** SQLite memory (`SqliteStore`) ✅; Dataverse memory, real approval
+  flow, and plugin discovery next.
 - **0.3:** Service Bus/Event Grid bus, voice coordinator, telemetry to App
   Insights.
 - **1.0:** production hardening; migrate the AIOS room + projects onto the kernel.

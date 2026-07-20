@@ -91,10 +91,11 @@ can also copy [`_TEMPLATE.md`](./_TEMPLATE.md) by hand instead of the CLI.)
 **Phase 1 — Core system prompts (this directory):** MB-001 … MB-010. ✅ started
 
 **Version 2 — Platform specifications:**
-[MotherBridge Kernel Specification](./specs/KERNEL-SPEC.md) ✅ · Shared Memory
-Engine · Agent-to-Agent Communication Protocol · Prompt Version Manager · Event
-Bus Specification · Voice Integration Specification · Plugin SDK · API Standards ·
-Coding Standards · Enterprise Development Standards.
+[MotherBridge Kernel Specification](./specs/KERNEL-SPEC.md) ✅ ·
+[Shared Memory Engine](./specs/SHARED-MEMORY-SPEC.md) ✅ · Agent-to-Agent
+Communication Protocol · Prompt Version Manager · Event Bus Specification · Voice
+Integration Specification · Plugin SDK · API Standards · Coding Standards ·
+Enterprise Development Standards.
 
 The kernel is implemented in **Python**; a reference package lives in
 [`/kernel`](../../kernel/) and already loads these prompt files.

@@ -13,7 +13,9 @@ so it runs and tests anywhere. Only the optional HTTP surface needs FastAPI.
   into agents with name, title, and resolved version.
 - **Registers agents** and resolves prompt versions (pinning supported).
 - **Routes intents** to the owning agent (mirrors Lucy's routing table).
-- **Shared memory** (in-memory) with an append-only audit log.
+- **Shared memory** — scoped key/value + append-only audit log, with a
+  persistent `SqliteStore` alongside the in-memory backend (same interface).
+  See the [Shared Memory Engine spec](../docs/motherbridge/specs/SHARED-MEMORY-SPEC.md).
 - **Event bus** (in-process pub/sub), **policy engine** (default-deny + approval
   gating), **telemetry**, and **health** — all as swappable interfaces.
 - **FastAPI surface** exposing the kernel API.

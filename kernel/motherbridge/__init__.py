@@ -4,7 +4,7 @@ from .bus import EventBus
 from .config import ConfigManager
 from .health import HealthMonitor
 from .kernel import Kernel
-from .memory import InMemoryStore, SharedMemory
+from .memory import InMemoryStore, SharedMemory, SqliteStore
 from .models import Agent, Decision, Event, MemoryRecord, Project, PromptDoc, Task
 from .policy import PolicyEngine
 from .prompts import PromptLibrary
@@ -19,7 +19,7 @@ __version__ = "0.1.0"
 
 __all__ = [
     "Kernel", "PromptLibrary", "PromptVersionManager", "AgentRegistry",
-    "SharedMemory", "InMemoryStore", "EventBus", "Router", "PolicyEngine",
+    "SharedMemory", "InMemoryStore", "SqliteStore", "EventBus", "Router", "PolicyEngine",
     "Telemetry", "HealthMonitor", "ConfigManager", "org",
     "Agent", "PromptDoc", "Task", "Project",
     "Event", "MemoryRecord", "Decision",
