@@ -160,7 +160,27 @@ class PolicyEngine:
 # Decision: allow | deny(reason) | needs_approval(reason)
 ```
 
-### 6.7 Plugin Manager, Voice Coordinator, Telemetry, Health
+### 6.7 Configuration Manager
+Kernel configuration from defaults overlaid by environment (`MB_*`).
+```python
+class ConfigManager:
+    def get(self, key: str, default: Any = None) -> Any: ...
+    def set(self, key: str, value: Any) -> None: ...
+    def all(self) -> dict: ...
+```
+
+### 6.8 Org hierarchy (reporting/escalation)
+Routing stays flat; the org module encodes *reporting lines* so escalation
+follows the chart (see [org-chart.md](../org-chart.md)).
+```python
+def lead_of(agent_id: str) -> str | None: ...
+def escalation_chain(agent_id: str) -> list[str]: ...   # up to Lucy (MB-001)
+def direct_reports(agent_id: str) -> list[str]: ...
+```
+Leads: Julian (MB-002), JABBNETWORKS (MB-007), Kaira (MB-009) report to Lucy.
+Alex/Brianna/Bianca → Julian; Ryan/Christina/MiaKkcar → JABBNETWORKS.
+
+### 6.9 Plugin Manager, Voice Coordinator, Telemetry, Health
 - **PluginManager** — discover/load/verify plugins against the Plugin SDK
   contract (V2 doc).
 - **VoiceCoordinator** — manage Azure Speech STT/TTS sessions per agent voice

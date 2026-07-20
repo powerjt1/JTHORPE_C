@@ -20,31 +20,33 @@ class TestPromptLibrary(unittest.TestCase):
         ids = [d.id for d in self.docs]
         self.assertEqual(ids, [f"MB-{n:03d}" for n in range(1, 11)])
 
-    def test_parses_title_with_commas(self):
-        christina = self.lib.get("MB-008")
-        self.assertEqual(christina.name, "Christina")
-        self.assertEqual(christina.title, "QA, Testing & DevOps Director")
+    def test_reconciled_titles(self):
+        self.assertEqual(self.lib.get("MB-003").title, "Automation Architect")
+        self.assertEqual(self.lib.get("MB-005").title, "Portal & Analytics Architect")
+        self.assertEqual(self.lib.get("MB-006").title, "Data & Fabric Architect")
+        self.assertEqual(self.lib.get("MB-008").title, "QA & DevOps Director")
+        self.assertEqual(self.lib.get("MB-010").title, "Product & Customer Experience Director")
 
     def test_lucy_identity_and_version(self):
         lucy = self.lib.get("MB-001")
         self.assertEqual(lucy.name, "Lucy")
         self.assertEqual(lucy.title, "Chief AI Orchestrator")
-        self.assertEqual(lucy.version, "1.1.0")
+        self.assertEqual(lucy.version, "1.2.0")
 
-    def test_specialists_are_v110(self):
-        self.assertEqual(self.lib.get("MB-003").version, "1.1.0")
-        self.assertEqual(self.lib.get("MB-009").version, "1.1.0")
+    def test_all_agents_are_v120(self):
+        for n in range(1, 11):
+            self.assertEqual(self.lib.get(f"MB-{n:03d}").version, "1.2.0")
 
 
 class TestVersions(unittest.TestCase):
     def test_pin_and_resolve(self):
         lib = PromptLibrary(); lib.load()
         vm = PromptVersionManager(lib)
-        self.assertEqual(vm.current_version("MB-002"), "1.1.0")
+        self.assertEqual(vm.current_version("MB-002"), "1.2.0")
         vm.pin("MB-002", "1.0.0")
         self.assertEqual(vm.resolve("MB-002"), "1.0.0")
         vm.unpin("MB-002")
-        self.assertEqual(vm.resolve("MB-002"), "1.1.0")
+        self.assertEqual(vm.resolve("MB-002"), "1.2.0")
 
 
 class TestRouter(unittest.TestCase):
@@ -95,7 +97,7 @@ class TestKernel(unittest.TestCase):
     def test_boot_registers_agents(self):
         k = Kernel().boot()
         self.assertEqual(len(k.agents()), 10)
-        self.assertEqual(k.resolve_version("MB-001"), "1.1.0")
+        self.assertEqual(k.resolve_version("MB-001"), "1.2.0")
 
     def test_dispatch_routes_records_and_emits(self):
         k = Kernel().boot()
@@ -105,6 +107,51 @@ class TestKernel(unittest.TestCase):
         self.assertEqual(task.agent_id, "MB-002")
         self.assertEqual(len(seen), 1)
         self.assertEqual(len(k.memory.history("proj1")), 1)
+
+
+class TestOrg(unittest.TestCase):
+    def test_reporting_lines(self):
+        from motherbridge import org
+        self.assertIsNone(org.lead_of("MB-001"))
+        self.assertEqual(org.lead_of("MB-003"), "MB-002")   # Alex -> Julian
+        self.assertEqual(org.lead_of("MB-006"), "MB-007")   # Ryan -> JABBNETWORKS
+
+    def test_escalation_chain(self):
+        from motherbridge import org
+        self.assertEqual(org.escalation_chain("MB-003"), ["MB-002", "MB-001"])
+        self.assertEqual(org.escalation_chain("MB-008"), ["MB-007", "MB-001"])
+        self.assertEqual(org.escalation_chain("MB-002"), ["MB-001"])
+        self.assertEqual(org.escalation_chain("MB-001"), [])
+
+    def test_direct_reports(self):
+        from motherbridge import org
+        self.assertEqual(org.direct_reports("MB-001"), ["MB-002", "MB-007", "MB-009"])
+        self.assertEqual(org.direct_reports("MB-002"), ["MB-003", "MB-004", "MB-005"])
+        self.assertEqual(org.direct_reports("MB-007"), ["MB-006", "MB-008", "MB-010"])
+
+    def test_kernel_exposes_org(self):
+        k = Kernel().boot()
+        self.assertEqual(k.escalation_chain("MB-005"), ["MB-002", "MB-001"])
+        self.assertEqual(k.direct_reports("MB-007"), ["MB-006", "MB-008", "MB-010"])
+
+
+class TestConfig(unittest.TestCase):
+    def test_defaults_and_set(self):
+        from motherbridge import ConfigManager
+        c = ConfigManager(defaults={"log_level": "info"})
+        self.assertEqual(c.get("log_level"), "info")
+        c.set("log_level", "debug")
+        self.assertEqual(c.get("log_level"), "debug")
+        self.assertIsNone(c.get("missing"))
+
+    def test_env_overlay(self):
+        import os
+        from motherbridge import ConfigManager
+        os.environ["MB_TEST_KEY"] = "from-env"
+        try:
+            self.assertEqual(ConfigManager().get("test_key"), "from-env")
+        finally:
+            del os.environ["MB_TEST_KEY"]
 
 
 if __name__ == "__main__":

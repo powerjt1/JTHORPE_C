@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import uuid
 
+from . import org
 from .bus import EventBus
+from .config import ConfigManager
 from .health import HealthMonitor
 from .memory import InMemoryStore, SharedMemory
 from .models import Agent, Event, MemoryRecord, Task
@@ -16,7 +18,9 @@ from .versions import PromptVersionManager
 
 
 class Kernel:
-    def __init__(self, prompts_dir=None, memory: SharedMemory | None = None) -> None:
+    def __init__(self, prompts_dir=None, memory: SharedMemory | None = None,
+                 config: ConfigManager | None = None) -> None:
+        self.config = config or ConfigManager()
         self.library = PromptLibrary(prompts_dir)
         self.versions = PromptVersionManager(self.library)
         self.registry = AgentRegistry()
@@ -35,7 +39,7 @@ class Kernel:
                 id=doc.id, name=doc.name, title=doc.title,
                 version=self.versions.resolve(doc.id),
             ))
-        for name in ("registry", "prompts", "memory", "bus", "router", "policy"):
+        for name in ("config", "registry", "prompts", "memory", "bus", "router", "policy", "org"):
             self.health.set(name, "healthy")
         self.telemetry.record("kernel.boot", agents=len(self.registry))
         self._booted = True
@@ -46,6 +50,16 @@ class Kernel:
 
     def resolve_version(self, agent_id: str) -> str:
         return self.versions.resolve(agent_id)
+
+    # --- Org hierarchy (reporting/escalation chain; routing stays flat) ---
+    def lead_of(self, agent_id: str) -> str | None:
+        return org.lead_of(agent_id)
+
+    def escalation_chain(self, agent_id: str) -> list[str]:
+        return org.escalation_chain(agent_id)
+
+    def direct_reports(self, agent_id: str) -> list[str]:
+        return org.direct_reports(agent_id)
 
     def dispatch(self, project_id: str, intent: str) -> Task:
         """Route an intent to an agent, record it, and emit an event.

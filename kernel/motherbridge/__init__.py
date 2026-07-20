@@ -1,5 +1,7 @@
 """MotherBridge kernel — reference package (see docs/motherbridge/specs/KERNEL-SPEC.md)."""
+from . import org
 from .bus import EventBus
+from .config import ConfigManager
 from .health import HealthMonitor
 from .kernel import Kernel
 from .memory import InMemoryStore, SharedMemory
@@ -18,7 +20,8 @@ __version__ = "0.1.0"
 __all__ = [
     "Kernel", "PromptLibrary", "PromptVersionManager", "AgentRegistry",
     "SharedMemory", "InMemoryStore", "EventBus", "Router", "PolicyEngine",
-    "Telemetry", "HealthMonitor", "Agent", "PromptDoc", "Task", "Project",
+    "Telemetry", "HealthMonitor", "ConfigManager", "org",
+    "Agent", "PromptDoc", "Task", "Project",
     "Event", "MemoryRecord", "Decision",
     "create_agent", "next_number", "render_agent",
     "validate_text", "validate_file", "validate_library",

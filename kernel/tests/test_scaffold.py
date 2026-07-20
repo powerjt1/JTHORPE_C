@@ -61,6 +61,14 @@ class TestScaffold(unittest.TestCase):
     def test_render_has_all_sections(self):
         self.assertEqual(validate_text(render_agent(11, "Nova", "Ops")), [])
 
+    def test_title_with_comma_parses(self):
+        # The H1 parser must split name from a comma-containing title correctly.
+        with tempfile.TemporaryDirectory() as d:
+            create_agent("Quinn", "QA, Testing & Release Lead", prompts_dir=d)
+            doc = PromptLibrary(d).load()[0]
+            self.assertEqual(doc.name, "Quinn")
+            self.assertEqual(doc.title, "QA, Testing & Release Lead")
+
 
 if __name__ == "__main__":
     unittest.main()

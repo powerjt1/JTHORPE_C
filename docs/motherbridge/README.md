@@ -1,6 +1,6 @@
 # MotherBridge Prompt Library
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Company:** JABBNETWORKS LLC
 **Product:** JABBNETWORKS AIOS Enterprise
 **Kernel implementation:** Python 3.11+ (FastAPI) — see the
@@ -35,14 +35,17 @@ into a full kernel.
 |---|-------|-------|--------|
 | 01 | **Lucy** | Chief AI Orchestrator | [MB-001](./prompts/MB-001-lucy.md) |
 | 02 | **Julian** | Enterprise Solution Architect | [MB-002](./prompts/MB-002-julian.md) |
-| 03 | **Alex** | Automation & Azure Architect | [MB-003](./prompts/MB-003-alex.md) |
+| 03 | **Alex** | Automation Architect | [MB-003](./prompts/MB-003-alex.md) |
 | 04 | **Brianna** | Power Apps Architect | [MB-004](./prompts/MB-004-brianna.md) |
-| 05 | **Bianca** | Power Pages & Power BI Architect | [MB-005](./prompts/MB-005-bianca.md) |
-| 06 | **Ryan** | Microsoft Fabric & Data Architect | [MB-006](./prompts/MB-006-ryan.md) |
+| 05 | **Bianca** | Portal & Analytics Architect | [MB-005](./prompts/MB-005-bianca.md) |
+| 06 | **Ryan** | Data & Fabric Architect | [MB-006](./prompts/MB-006-ryan.md) |
 | 07 | **JABBNETWORKS** | Platform Operations Architect | [MB-007](./prompts/MB-007-jabbnetworks.md) |
-| 08 | **Christina** | QA, Testing & DevOps Director | [MB-008](./prompts/MB-008-christina.md) |
+| 08 | **Christina** | QA & DevOps Director | [MB-008](./prompts/MB-008-christina.md) |
 | 09 | **Kaira** | Security & Governance Director | [MB-009](./prompts/MB-009-kaira.md) |
-| 10 | **MiaKkcar** | Product Strategy & Customer Experience Director | [MB-010](./prompts/MB-010-miakkcar.md) |
+| 10 | **MiaKkcar** | Product & Customer Experience Director | [MB-010](./prompts/MB-010-miakkcar.md) |
+
+See the [org chart, structure & motto](./org-chart.md) for reporting lines and
+the v1.0 roadmap.
 
 > **Roster note.** This supersedes the earlier draft roster in
 > [../agents/](../agents/): Lucy is now Chief Orchestrator (previously Christina
