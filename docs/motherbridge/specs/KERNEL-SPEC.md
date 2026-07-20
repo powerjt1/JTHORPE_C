@@ -111,6 +111,8 @@ class AgentRegistry:
 
 ### 6.2 Prompt Library & Version Manager
 Loads the `MB-0NN-*.md` files, exposes id/name/title/current version, and pins.
+Full contract in the
+[Prompt Version Manager Specification](./PROMPT-VERSION-MANAGER-SPEC.md).
 ```python
 class PromptLibrary:
     def load(self) -> list[PromptDoc]: ...
@@ -119,6 +121,7 @@ class PromptLibrary:
 class PromptVersionManager:
     def current_version(self, agent_id: str) -> str: ...
     def pin(self, agent_id: str, version: str) -> None: ...
+    def unpin(self, agent_id: str) -> None: ...
     def resolve(self, agent_id: str) -> str: ...   # pinned or current
 ```
 Current version = the highest SemVer in the prompt's Version History.

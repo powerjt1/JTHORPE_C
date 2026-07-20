@@ -96,7 +96,8 @@ can also copy [`_TEMPLATE.md`](./_TEMPLATE.md) by hand instead of the CLI.)
 [MotherBridge Kernel Specification](./specs/KERNEL-SPEC.md) ✅ ·
 [Shared Memory Engine](./specs/SHARED-MEMORY-SPEC.md) ✅ ·
 [Agent-to-Agent Communication Protocol](./specs/A2A-PROTOCOL-SPEC.md) ✅ ·
-Prompt Version Manager · Event Bus Specification · Voice
+[Prompt Version Manager](./specs/PROMPT-VERSION-MANAGER-SPEC.md) ✅ ·
+Event Bus Specification · Voice
 Integration Specification · Plugin SDK · API Standards · Coding Standards ·
 Enterprise Development Standards.
 
