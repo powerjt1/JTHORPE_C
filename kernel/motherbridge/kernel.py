@@ -6,6 +6,7 @@ import uuid
 from . import org
 from .bus import EventBus
 from .config import ConfigManager
+from .connections import ConnectionRegistry, default_connections
 from .health import HealthMonitor
 from .memory import InMemoryStore, SharedMemory
 from .models import Agent, Event, MemoryRecord, Task
@@ -28,6 +29,7 @@ class Kernel:
         self.bus = EventBus()
         self.router = Router()
         self.policy = PolicyEngine()
+        self.connections = ConnectionRegistry()
         self.telemetry = Telemetry()
         self.health = HealthMonitor()
         self._booted = False
@@ -39,7 +41,9 @@ class Kernel:
                 id=doc.id, name=doc.name, title=doc.title,
                 version=self.versions.resolve(doc.id),
             ))
-        for name in ("config", "registry", "prompts", "memory", "bus", "router", "policy", "org"):
+        for conn in default_connections():
+            self.connections.register(conn)
+        for name in ("config", "registry", "prompts", "memory", "bus", "router", "policy", "org", "connections"):
             self.health.set(name, "healthy")
         self.telemetry.record("kernel.boot", agents=len(self.registry))
         self._booted = True

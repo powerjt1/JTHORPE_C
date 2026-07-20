@@ -2,6 +2,7 @@
 from . import org
 from .bus import EventBus
 from .config import ConfigManager
+from .connections import Connection, ConnectionRegistry, default_connections
 from .health import HealthMonitor
 from .kernel import Kernel
 from .memory import InMemoryStore, SharedMemory, SqliteStore
@@ -21,6 +22,7 @@ __all__ = [
     "Kernel", "PromptLibrary", "PromptVersionManager", "AgentRegistry",
     "SharedMemory", "InMemoryStore", "SqliteStore", "EventBus", "Router", "PolicyEngine",
     "Telemetry", "HealthMonitor", "ConfigManager", "org",
+    "Connection", "ConnectionRegistry", "default_connections",
     "Agent", "PromptDoc", "Task", "Project",
     "Event", "MemoryRecord", "Decision",
     "create_agent", "next_number", "render_agent",

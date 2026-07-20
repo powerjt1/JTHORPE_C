@@ -23,6 +23,8 @@ coordinates everything behind the scenes. It:
 - enforces coding and security policies,
 - manages plugins and coordinates voice sessions,
 - collects telemetry and monitors system health.
+- brokers **external connections** (APIs, MCP servers) — see
+  [connections.md](./connections.md); agents never call out directly.
 
 Think Windows/Linux kernel: essential, always-on, invisible. It is the
 evolution of the earlier "Nexus" master-connector concept
