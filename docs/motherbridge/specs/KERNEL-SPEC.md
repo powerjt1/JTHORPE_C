@@ -85,6 +85,7 @@ kernel/
 │  ├─ messaging.py       # MessageBroker — A2A messages (notify/request/reply/escalate)
 │  ├─ router.py          # Router — intent → agent id
 │  ├─ policy.py          # PolicyEngine — allow/deny + approvals
+│  ├─ plugins.py         # PluginManager — discover/verify plugin manifests
 │  ├─ telemetry.py       # Telemetry sink
 │  ├─ health.py          # HealthMonitor
 │  └─ kernel.py          # Kernel facade tying it together
@@ -211,8 +212,8 @@ Leads: Julian (MB-002), JABBNETWORKS (MB-007), Kaira (MB-009) report to Lucy.
 Alex/Brianna/Bianca → Julian; Ryan/Christina/MiaKkcar → JABBNETWORKS.
 
 ### 6.9 Plugin Manager, Voice Coordinator, Telemetry, Health
-- **PluginManager** — discover/load/verify plugins against the Plugin SDK
-  contract (V2 doc).
+- **PluginManager** — discover/verify plugin manifests; full contract in the
+  [Plugin SDK Specification](./PLUGIN-SDK-SPEC.md).
 - **VoiceCoordinator** — manage Azure Speech STT/TTS sessions per agent voice;
   full contract in the [Voice Integration Specification](./VOICE-INTEGRATION-SPEC.md).
 - **Telemetry** — structured events (latency, outcomes, cost) to the sink.

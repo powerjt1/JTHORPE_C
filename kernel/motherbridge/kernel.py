@@ -11,6 +11,7 @@ from .health import HealthMonitor
 from .memory import InMemoryStore, SharedMemory
 from .messaging import Message, MessageBroker
 from .models import Agent, Event, MemoryRecord, Task
+from .plugins import PluginManager
 from .policy import PolicyEngine
 from .prompts import PromptLibrary
 from .registry import AgentRegistry
@@ -33,6 +34,7 @@ class Kernel:
                                        escalation_chain=org.escalation_chain)
         self.policy = PolicyEngine()
         self.connections = ConnectionRegistry()
+        self.plugins = PluginManager()
         self.telemetry = Telemetry()
         self.health = HealthMonitor()
         self._booted = False
@@ -46,8 +48,9 @@ class Kernel:
             ))
         for conn in default_connections():
             self.connections.register(conn)
+        self.plugins.discover()  # register any docs/motherbridge/plugins/*.plugin.json
         for name in ("config", "registry", "prompts", "memory", "bus", "router",
-                     "messaging", "policy", "org", "connections"):
+                     "messaging", "policy", "org", "connections", "plugins"):
             self.health.set(name, "healthy")
         self.telemetry.record("kernel.boot", agents=len(self.registry))
         self._booted = True

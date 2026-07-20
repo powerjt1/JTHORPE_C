@@ -8,6 +8,7 @@ from .kernel import Kernel
 from .memory import InMemoryStore, SharedMemory, SqliteStore
 from .messaging import KINDS, Message, MessageBroker
 from .models import Agent, Decision, Event, MemoryRecord, Project, PromptDoc, Task
+from .plugins import PluginError, PluginManager, PluginManifest, verify_manifest
 from .policy import PolicyEngine
 from .prompts import PromptLibrary
 from .registry import AgentRegistry
@@ -25,6 +26,7 @@ __all__ = [
     "MessageBroker", "Message", "KINDS",
     "Telemetry", "HealthMonitor", "ConfigManager", "org",
     "Connection", "ConnectionRegistry", "default_connections",
+    "PluginManager", "PluginManifest", "PluginError", "verify_manifest",
     "Agent", "PromptDoc", "Task", "Project",
     "Event", "MemoryRecord", "Decision",
     "create_agent", "next_number", "render_agent",
