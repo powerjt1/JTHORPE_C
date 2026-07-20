@@ -17,6 +17,7 @@ var config = cfg.config;
 var authRoutes = require("./routes/auth");
 var emailRoutes = require("./routes/email");
 var projectRoutes = require("./routes/projects");
+var dashboardRoutes = require("./routes/dashboard");
 
 if (!config.cookieSecret) {
   // Fail fast: signed cookies are required for state/PKCE and the session.
@@ -62,6 +63,7 @@ app.get("/healthz", function (req, res) {
 app.use("/auth", authRoutes);
 app.use("/email", emailRoutes);
 app.use("/projects", projectRoutes);
+app.use("/dashboard", dashboardRoutes);
 
 // Optionally serve the static marketing site from the repo root.
 if (process.env.SERVE_STATIC === "true") {

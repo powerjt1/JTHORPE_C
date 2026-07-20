@@ -44,7 +44,7 @@
       <!-- Title bar -->
       <header class="cc-titlebar">
         <div>
-          <p class="eyebrow">JABBNETWORKS AIOS <span class="demo-badge">Concept dashboard</span></p>
+          <p class="eyebrow">JABBNETWORKS AIOS <span class="demo-badge" id="ccMode">Concept dashboard</span></p>
           <h1>Enterprise AI Command Center</h1>
         </div>
         <div class="cc-live"><span class="cc-dot"></span> LIVE · <span id="ccClock">10:30 AM</span></div>
@@ -52,10 +52,10 @@
 
       <!-- KPI tiles -->
       <section class="cc-kpis" aria-label="Key metrics">
-        <div class="cc-kpi"><span class="cc-kpi-label">Active Projects</span><span class="cc-kpi-value">12</span><span class="cc-kpi-delta up">+2 today</span></div>
-        <div class="cc-kpi"><span class="cc-kpi-label">AI Agents</span><span class="cc-kpi-value">10/10</span><span class="cc-kpi-delta">All online</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">Active Projects</span><span class="cc-kpi-value" id="kActiveProjects">12</span><span class="cc-kpi-delta up">+2 today</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">AI Agents</span><span class="cc-kpi-value" id="kAgents">10/10</span><span class="cc-kpi-delta">All online</span></div>
         <div class="cc-kpi"><span class="cc-kpi-label">Automation Runs</span><span class="cc-kpi-value">1,429</span><span class="cc-kpi-delta up">+15.3%</span></div>
-        <div class="cc-kpi"><span class="cc-kpi-label">Success Rate</span><span class="cc-kpi-value">98.7%</span><span class="cc-kpi-delta up">+2.1%</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">Success Rate</span><span class="cc-kpi-value" id="kSuccess">98.7%</span><span class="cc-kpi-delta up">+2.1%</span></div>
         <div class="cc-kpi"><span class="cc-kpi-label">API Calls</span><span class="cc-kpi-value">42,531</span><span class="cc-kpi-delta up">+18.7%</span></div>
         <div class="cc-kpi"><span class="cc-kpi-label">Security Score</span><span class="cc-kpi-value">100%</span><span class="cc-kpi-delta">Excellent</span></div>
         <div class="cc-kpi"><span class="cc-kpi-label">Deployments</span><span class="cc-kpi-value">23</span><span class="cc-kpi-delta">This week</span></div>
@@ -84,7 +84,7 @@
         <!-- Center: workload + performance -->
         <section class="cc-card">
           <header class="cc-card-head"><h2>Agent workload</h2><span class="cc-sub">last 24h</span></header>
-          <ul class="cc-bars">
+          <ul class="cc-bars" id="ccWorkload">
             <li><span>Lucy</span><div class="cc-bar"><i style="width:100%"></i></div><b>100%</b></li>
             <li><span>Christina</span><div class="cc-bar"><i style="width:95%"></i></div><b>95%</b></li>
             <li><span>Kaira</span><div class="cc-bar"><i style="width:92%"></i></div><b>92%</b></li>
@@ -109,8 +109,8 @@
         <section class="cc-card">
           <header class="cc-card-head"><h2>Project health</h2><span class="cc-sub">12 projects</span></header>
           <div class="cc-health">
-            <div class="cc-donut" style="--ontrack:58%;--atrisk:83%;--delayed:92%"><span>12</span></div>
-            <ul class="cc-legend">
+            <div class="cc-donut" id="ccDonut" style="--ontrack:58%;--atrisk:83%;--delayed:92%"><span id="ccDonutTotal">12</span></div>
+            <ul class="cc-legend" id="ccLegend">
               <li><i style="background:#43e08a"></i>On track <b>7</b></li>
               <li><i style="background:#f59e0b"></i>At risk <b>3</b></li>
               <li><i style="background:#ff6b6b"></i>Delayed <b>1</b></li>
@@ -119,7 +119,7 @@
           </div>
 
           <header class="cc-card-head" style="margin-top:18px;"><h2>Activity timeline</h2><span class="cc-sub cc-live-sub">live</span></header>
-          <ul class="cc-timeline">
+          <ul class="cc-timeline" id="ccTimeline">
             <li><span class="cc-t-time">10:30</span> <b>Alex</b> completed flow "Invoice Approval"</li>
             <li><span class="cc-t-time">10:28</span> <b>Brianna</b> published Power App "Service Desk"</li>
             <li><span class="cc-t-time">10:25</span> <b>Ryan</b> refreshed Fabric warehouse "SalesDW"</li>
@@ -161,13 +161,9 @@
     </div>
   </footer>
 
+  <!-- Runtime config (served by the backend in live mode; 404 -> concept data). -->
+  <script src="aios-config.js" defer></script>
   <script src="js/main.js" defer></script>
-  <script>
-    (function () {
-      var c = document.getElementById("ccClock");
-      function tick(){ if(c) c.textContent = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
-      tick(); setInterval(tick, 30000);
-    })();
-  </script>
+  <script src="js/command-center.js" defer></script>
 </body>
 </html>

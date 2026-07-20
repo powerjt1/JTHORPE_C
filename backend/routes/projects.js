@@ -97,13 +97,14 @@ router.post("/:id/tick", async function (req, res) {
   if (!requireOwner(req, res, project)) return;
 
   try {
+    var nowTs = new Date().toISOString();
     var active = project.tasks.find(function (t) { return t.status === "active"; });
     if (active) {
-      await projects.updateTask(active.id, { status: "done", message: PHASES[active.phase].done });
+      await projects.updateTask(active.id, { status: "done", message: PHASES[active.phase].done, updatedAt: nowTs });
     }
     var next = project.tasks.find(function (t) { return t.status === "queued"; });
     if (next) {
-      await projects.updateTask(next.id, { status: "active", message: PHASES[next.phase].active });
+      await projects.updateTask(next.id, { status: "active", message: PHASES[next.phase].active, updatedAt: nowTs });
     }
 
     var refreshed = await projects.getProject(req.params.id);
