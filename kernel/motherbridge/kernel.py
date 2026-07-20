@@ -9,6 +9,7 @@ from .config import ConfigManager
 from .connections import ConnectionRegistry, default_connections
 from .health import HealthMonitor
 from .memory import InMemoryStore, SharedMemory
+from .messaging import Message, MessageBroker
 from .models import Agent, Event, MemoryRecord, Task
 from .policy import PolicyEngine
 from .prompts import PromptLibrary
@@ -28,6 +29,8 @@ class Kernel:
         self.memory: SharedMemory = memory or InMemoryStore()
         self.bus = EventBus()
         self.router = Router()
+        self.messaging = MessageBroker(self.bus, self.memory, self.router,
+                                       escalation_chain=org.escalation_chain)
         self.policy = PolicyEngine()
         self.connections = ConnectionRegistry()
         self.telemetry = Telemetry()
@@ -43,7 +46,8 @@ class Kernel:
             ))
         for conn in default_connections():
             self.connections.register(conn)
-        for name in ("config", "registry", "prompts", "memory", "bus", "router", "policy", "org", "connections"):
+        for name in ("config", "registry", "prompts", "memory", "bus", "router",
+                     "messaging", "policy", "org", "connections"):
             self.health.set(name, "healthy")
         self.telemetry.record("kernel.boot", agents=len(self.registry))
         self._booted = True
@@ -64,6 +68,16 @@ class Kernel:
 
     def direct_reports(self, agent_id: str) -> list[str]:
         return org.direct_reports(agent_id)
+
+    # --- Agent-to-agent messaging (brokered via self.messaging) ---
+    def send_message(self, from_agent: str, intent: str, body: dict | None = None,
+                     to_agent: str | None = None, kind: str = "notify",
+                     conversation_id: str | None = None) -> Message:
+        return self.messaging.send(from_agent, intent, body=body, to_agent=to_agent,
+                                   kind=kind, conversation_id=conversation_id)
+
+    def escalate(self, from_agent: str, intent: str, body: dict | None = None) -> Message:
+        return self.messaging.escalate(from_agent, intent, body=body)
 
     def dispatch(self, project_id: str, intent: str) -> Task:
         """Route an intent to an agent, record it, and emit an event.

@@ -82,6 +82,7 @@ kernel/
 │  ├─ registry.py        # AgentRegistry
 │  ├─ memory.py          # SharedMemory protocol + InMemoryStore
 │  ├─ bus.py             # EventBus (in-process pub/sub)
+│  ├─ messaging.py       # MessageBroker — A2A messages (notify/request/reply/escalate)
 │  ├─ router.py          # Router — intent → agent id
 │  ├─ policy.py          # PolicyEngine — allow/deny + approvals
 │  ├─ telemetry.py       # Telemetry sink
@@ -145,7 +146,27 @@ class EventBus:
     def publish(self, event: Event) -> None: ...
 ```
 Topics (v1): `task.created`, `task.updated`, `task.completed`, `approval.required`,
-`policy.denied`, `health.degraded`.
+`policy.denied`, `health.degraded`; plus A2A topics `a2a.message` and per-recipient
+`agent.<MB-0NN>` (see §6.4a).
+
+### 6.4a Message Broker (A2A)
+Typed agent-to-agent messages, brokered over the Event Bus (delivery) and Shared
+Memory (append-only audit). Full contract in the
+[Agent-to-Agent Communication Protocol](./A2A-PROTOCOL-SPEC.md).
+```python
+class MessageBroker:
+    def on(self, agent_id: str, handler: Callable[[Message], None]) -> None: ...
+    def send(self, from_agent, intent, body=None, to_agent=None,
+             kind="notify", conversation_id=None, reply_to=None) -> Message: ...
+    def request(self, from_agent, intent, body=None, to_agent=None,
+                conversation_id=None) -> Message: ...
+    def reply(self, to_message, from_agent, body=None) -> Message: ...
+    def escalate(self, from_agent, intent, body=None) -> Message: ...  # up the org chart
+    def inbox(self, agent_id) -> list[Message]: ...
+    def thread(self, conversation_id) -> list[Message]: ...
+```
+Recipient = explicit `to_agent`, else routed from `intent`. `escalate` targets the
+sender's lead via `org.escalation_chain`. Exposed on the facade as `kernel.messaging`.
 
 ### 6.5 Router
 Maps an intent to the owning agent (mirrors Lucy's routing table).

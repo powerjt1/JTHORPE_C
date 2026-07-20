@@ -6,6 +6,7 @@ from .connections import Connection, ConnectionRegistry, default_connections
 from .health import HealthMonitor
 from .kernel import Kernel
 from .memory import InMemoryStore, SharedMemory, SqliteStore
+from .messaging import KINDS, Message, MessageBroker
 from .models import Agent, Decision, Event, MemoryRecord, Project, PromptDoc, Task
 from .policy import PolicyEngine
 from .prompts import PromptLibrary
@@ -21,6 +22,7 @@ __version__ = "0.1.0"
 __all__ = [
     "Kernel", "PromptLibrary", "PromptVersionManager", "AgentRegistry",
     "SharedMemory", "InMemoryStore", "SqliteStore", "EventBus", "Router", "PolicyEngine",
+    "MessageBroker", "Message", "KINDS",
     "Telemetry", "HealthMonitor", "ConfigManager", "org",
     "Connection", "ConnectionRegistry", "default_connections",
     "Agent", "PromptDoc", "Task", "Project",
