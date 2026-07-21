@@ -64,4 +64,17 @@ def default_connections() -> list[Connection]:
             notes="External MCP server. Brokered by the kernel; agents call it "
                   "via MotherBridge, never directly. See docs/motherbridge/connections.md.",
         ),
+        Connection(
+            id="anthropic-claude",
+            service="Anthropic — Claude model",
+            kind="llm",
+            endpoint="https://api.anthropic.com",
+            auth="env:ANTHROPIC_API_KEY",       # reference only; key lives in the environment
+            status="pending",                   # active once ANTHROPIC_API_KEY is set server-side
+            agents=["MB-001", "MB-002", "MB-003", "MB-004", "MB-005",
+                    "MB-006", "MB-007", "MB-008", "MB-009", "MB-010"],
+            notes="Live agent replies. Used server-side by the backend "
+                  "(/agents/:id/ask); the key is never exposed to clients. "
+                  "See docs/motherbridge/connections.md.",
+        ),
     ]

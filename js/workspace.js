@@ -223,7 +223,7 @@
     var typing = bubble("agent typing", current.name + " is thinking…");
 
     var speakerId = current.id;
-    var done = function (text, simulated) {
+    var done = function (text, simulated, model) {
       typing.remove();
       var b = bubble("agent", text);
       b.title = "Click to hear again";
@@ -231,12 +231,23 @@
       b.addEventListener("click", function () { if (window.AIOSVoice) window.AIOSVoice.speak(speakerId, text); });
       if (speakOn && window.AIOSVoice) window.AIOSVoice.speak(speakerId, text);
       if (el("wsStatus")) { el("wsStatus").textContent = "online"; el("wsStatus").classList.remove("working"); }
-      if (el("wsSimNote")) el("wsSimNote").hidden = !simulated;
+      var note = el("wsSimNote");
+      if (note) {
+        if (simulated) {
+          note.textContent = "Grounded role-based reply — not a live model. Set ANTHROPIC_API_KEY to enable live replies.";
+        } else {
+          note.textContent = "Live model reply" + (model ? " · " + model : "");
+        }
+        note.hidden = false;
+      }
     };
 
     if (CONFIG.backendEnabled) {
       apiPost("/agents/" + current.id + "/ask", { question: q })
-        .then(function (d) { done(d && d.answer ? d.answer : composeLocal(current, q), d ? d.simulated : true); })
+        .then(function (d) {
+          if (d && d.answer) done(d.answer, d.simulated !== false, d.model);
+          else done(composeLocal(current, q), true);
+        })
         .catch(function () { done(composeLocal(current, q), true); });
     } else {
       setTimeout(function () { done(composeLocal(current, q), true); }, 420);

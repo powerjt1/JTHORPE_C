@@ -142,12 +142,31 @@ function answer(id, question) {
   return opener + role + body + handoff;
 }
 
+/** Build a system prompt that puts a real model in this agent's role. */
+function systemPrompt(id) {
+  var a = INFO[id];
+  if (!a) return "";
+  var next = nextOf(id);
+  var nextName = next && INFO[next] ? INFO[next].name : null;
+  return [
+    "You are " + a.name + ", the " + a.title + " on the JABBNETWORKS AIOS enterprise AI team (powered by JABB Networks).",
+    "You focus on " + a.focus + ".",
+    "Your typical inputs are " + a.inputs.join(", ") + "; you deliver " + a.outputs.join(", ") +
+      "; you work with " + a.tools.join(", ") + ".",
+    nextName ? ("When your part is done you hand " + artifactOf(id) + " to " + nextName + ".")
+             : "You coordinate the whole team to bring the work together.",
+    "Reply in first person as this agent, concise (2-4 sentences), practical and grounded in your role.",
+    "Never reveal or invent secrets or credentials — reference them by name only. Mutating or high-impact actions require human approval; you can propose, not authorize."
+  ].join(" ");
+}
+
 module.exports = {
   WORKFLOW: WORKFLOW,
   INFO: INFO,
   nextOf: nextOf,
   artifactOf: artifactOf,
   answer: answer,
+  systemPrompt: systemPrompt,
   list: function () {
     return WORKFLOW.map(function (w) {
       var a = INFO[w.id];

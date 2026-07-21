@@ -11,6 +11,14 @@ Nexus master-connector model. Registry:
 | id | Service | Kind | Endpoint | Auth (ref) | Status | Agents |
 |----|---------|------|----------|-----------|--------|--------|
 | `opus-pro-agent-mcp` | Opus Pro — Agent MCP | `mcp` | `https://api.opus.pro/api/agent-mcp` | `keyvault:opus-pro-token` | **pending** | MB-001 (Lucy) |
+| `anthropic-claude` | Anthropic — Claude model | `llm` | `https://api.anthropic.com` | `env:ANTHROPIC_API_KEY` | **pending** | all (MB-001…MB-010) |
+
+`anthropic-claude` powers **live agent replies** in the Workspace ask console
+(`POST /agents/:id/ask`). The backend calls it **server-side** with the agent's
+role as the system prompt; the key comes from `ANTHROPIC_API_KEY` (env) and is
+never sent to the browser. Set the key (and optionally `ANTHROPIC_MODEL` /
+`ANTHROPIC_BASE_URL`) to activate; without it, agents use the deterministic
+grounded reply. See [`backend/.env.example`](../../backend/.env.example).
 
 `status: pending` means the connection is declared but not usable yet — it needs
 the two enablement steps below.
