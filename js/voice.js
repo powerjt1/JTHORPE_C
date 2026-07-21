@@ -66,18 +66,52 @@
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
   var sttSupported = !!SR;
 
-  function listen(onResult, onEnd) {
-    if (!SR) { if (onEnd) onEnd("unsupported"); return null; }
-    var rec;
-    try { rec = new SR(); } catch (e) { if (onEnd) onEnd("error"); return null; }
-    rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 1;
+  // Reuse ONE recognition instance and lock the mic permission once, so Chrome
+  // doesn't re-prompt on every click. (Permission only persists on a secure
+  // origin — https or http://localhost — not file://.)
+  var _rec = null;
+  var _listening = false;
+  var _micReady = false;
+
+  function _recognizer() {
+    if (_rec || !SR) return _rec;
+    var rec = new SR();
+    rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 1; rec.continuous = false;
+    _rec = rec;
+    return _rec;
+  }
+
+  function _start(rec, onResult, onEnd) {
+    if (_listening) return;               // don't start twice
     rec.onresult = function (e) {
       var t = e.results && e.results[0] && e.results[0][0] ? e.results[0][0].transcript : "";
       if (onResult) onResult(t);
     };
-    rec.onerror = function (e) { if (onEnd) onEnd(e && e.error ? e.error : "error"); };
-    rec.onend = function () { if (onEnd) onEnd(null); };
-    try { rec.start(); } catch (e) { if (onEnd) onEnd("error"); return null; }
+    rec.onerror = function (e) { _listening = false; if (onEnd) onEnd(e && e.error ? e.error : "error"); };
+    rec.onend = function () { _listening = false; if (onEnd) onEnd(null); };
+    try { _listening = true; rec.start(); }
+    catch (e) { _listening = false; if (onEnd) onEnd("error"); }
+  }
+
+  function listen(onResult, onEnd) {
+    if (!SR) { if (onEnd) onEnd("unsupported"); return null; }
+    var rec = _recognizer();
+    if (!rec) { if (onEnd) onEnd("error"); return null; }
+    if (_listening) return rec;           // already listening — ignore repeat clicks
+
+    // First use: pre-acquire a persistent mic grant via getUserMedia so the
+    // recognition service reuses it without prompting again.
+    if (!_micReady && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+        _micReady = true;
+        stream.getTracks().forEach(function (t) { t.stop(); }); // release the device
+        _start(rec, onResult, onEnd);
+      }).catch(function () {
+        _start(rec, onResult, onEnd);     // permission denied/unavailable — let recognition handle it
+      });
+    } else {
+      _start(rec, onResult, onEnd);
+    }
     return rec;
   }
 
