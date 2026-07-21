@@ -14,7 +14,7 @@ class TestValidation(unittest.TestCase):
     def test_real_library_is_valid(self):
         prompts = Path(__file__).resolve().parents[2] / "docs" / "motherbridge" / "prompts"
         results = validate_library(prompts)
-        self.assertEqual(len(results), 10)
+        self.assertEqual(len(results), 12)
         for name, issues in results.items():
             self.assertEqual(issues, [], f"{name} has issues: {issues}")
 

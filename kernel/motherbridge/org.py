@@ -6,7 +6,9 @@ follows the org chart:
     Lucy (MB-001)
       ├─ Julian (MB-002)  ── Alex (MB-003), Brianna (MB-004), Bianca (MB-005)
       ├─ JABBNETWORKS (MB-007) ── Ryan (MB-006), Christina (MB-008), MiaKkcar (MB-010)
-      └─ Kaira (MB-009)
+      ├─ Kaira (MB-009)
+      ├─ Zeruiah (MB-011)      # Manager & Executive Producer (media)
+      └─ Don Colion (MB-012)   # Special Ops Developer
 """
 from __future__ import annotations
 
@@ -22,6 +24,8 @@ REPORTS_TO: dict[str, str | None] = {
     "MB-006": "MB-007",    # Ryan     -> JABBNETWORKS
     "MB-008": "MB-007",    # Christina-> JABBNETWORKS
     "MB-010": "MB-007",    # MiaKkcar -> JABBNETWORKS
+    "MB-011": "MB-001",    # Zeruiah  -> Lucy (media/production line)
+    "MB-012": "MB-001",    # Don Colion -> Lucy (special ops, direct line)
 }
 
 

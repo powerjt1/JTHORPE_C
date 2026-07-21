@@ -45,6 +45,8 @@ into a full kernel.
 | 08 | **Christina** | QA & DevOps Director | [MB-008](./prompts/MB-008-christina.md) |
 | 09 | **Kaira** | Security & Governance Director | [MB-009](./prompts/MB-009-kaira.md) |
 | 10 | **MiaKkcar** | Product & Customer Experience Director | [MB-010](./prompts/MB-010-miakkcar.md) |
+| 11 | **Zeruiah** | Manager & Executive Producer | [MB-011](./prompts/MB-011-zeruiah.md) |
+| 12 | **Don Colion** | Special Ops Developer | [MB-012](./prompts/MB-012-don-colion.md) |
 
 See the [org chart, structure & motto](./org-chart.md) for reporting lines and
 the v1.0 roadmap.
@@ -90,7 +92,9 @@ can also copy [`_TEMPLATE.md`](./_TEMPLATE.md) by hand instead of the CLI.)
 
 ## Roadmap
 
-**Phase 1 — Core system prompts (this directory):** MB-001 … MB-010. ✅ started
+**Phase 1 — Core system prompts (this directory):** MB-001 … MB-012. ✅ started
+(MB-011 Zeruiah — Manager & Executive Producer, media; MB-012 Don Colion —
+Special Ops Developer — extend the core team.)
 
 **Version 2 — Platform specifications:**
 [MotherBridge Kernel Specification](./specs/KERNEL-SPEC.md) ✅ ·

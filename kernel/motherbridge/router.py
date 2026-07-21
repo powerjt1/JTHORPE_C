@@ -12,6 +12,10 @@ _RULES: list[tuple[str, tuple[str, ...]]] = [
     ("MB-003", ("automation", "automate", "flow", "rpa", "azure function", "logic app")),
     ("MB-002", ("architecture", "architect", "solution design", "integration pattern", "alm")),
     ("MB-010", ("product", "strategy", "customer", "roadmap", "requirement", "ux research")),
+    ("MB-011", ("social media", "reality tv", "production", "producer", "content",
+                "campaign", "episode", "influencer", "audience", "brand")),
+    ("MB-012", ("special ops", "prototype", "proof of concept", "poc", "spike",
+                "hotfix", "rapid", "r&d", "experiment", "incident")),
 ]
 
 

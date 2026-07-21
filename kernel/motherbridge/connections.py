@@ -71,8 +71,8 @@ def default_connections() -> list[Connection]:
             endpoint="https://api.anthropic.com",
             auth="env:ANTHROPIC_API_KEY",       # reference only; key lives in the environment
             status="pending",                   # active once ANTHROPIC_API_KEY is set server-side
-            agents=["MB-001", "MB-002", "MB-003", "MB-004", "MB-005",
-                    "MB-006", "MB-007", "MB-008", "MB-009", "MB-010"],
+            agents=["MB-001", "MB-002", "MB-003", "MB-004", "MB-005", "MB-006",
+                    "MB-007", "MB-008", "MB-009", "MB-010", "MB-011", "MB-012"],
             notes="Live agent replies. Used server-side by the backend "
                   "(/agents/:id/ask); the key is never exposed to clients. "
                   "See docs/motherbridge/connections.md.",

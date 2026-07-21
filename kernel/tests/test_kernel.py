@@ -15,10 +15,10 @@ class TestPromptLibrary(unittest.TestCase):
         self.lib = PromptLibrary()
         self.docs = self.lib.load()
 
-    def test_loads_ten_agents(self):
-        self.assertEqual(len(self.docs), 10)
+    def test_loads_all_agents(self):
+        self.assertEqual(len(self.docs), 12)
         ids = [d.id for d in self.docs]
-        self.assertEqual(ids, [f"MB-{n:03d}" for n in range(1, 11)])
+        self.assertEqual(ids, [f"MB-{n:03d}" for n in range(1, 13)])
 
     def test_reconciled_titles(self):
         self.assertEqual(self.lib.get("MB-003").title, "Automation Architect")
@@ -96,7 +96,7 @@ class TestPolicy(unittest.TestCase):
 class TestKernel(unittest.TestCase):
     def test_boot_registers_agents(self):
         k = Kernel().boot()
-        self.assertEqual(len(k.agents()), 10)
+        self.assertEqual(len(k.agents()), 12)
         self.assertEqual(k.resolve_version("MB-001"), "1.2.0")
 
     def test_dispatch_routes_records_and_emits(self):
@@ -125,7 +125,7 @@ class TestOrg(unittest.TestCase):
 
     def test_direct_reports(self):
         from motherbridge import org
-        self.assertEqual(org.direct_reports("MB-001"), ["MB-002", "MB-007", "MB-009"])
+        self.assertEqual(org.direct_reports("MB-001"), ["MB-002", "MB-007", "MB-009", "MB-011", "MB-012"])
         self.assertEqual(org.direct_reports("MB-002"), ["MB-003", "MB-004", "MB-005"])
         self.assertEqual(org.direct_reports("MB-007"), ["MB-006", "MB-008", "MB-010"])
 

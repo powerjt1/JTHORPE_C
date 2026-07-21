@@ -18,6 +18,8 @@
 | 🚀 **Christina** | QA & DevOps Director | Testing, CI/CD, Azure DevOps, GitHub, deployments, release management |
 | 🛡 **Kaira** | Security & Governance Director | Microsoft Entra ID, RBAC, Key Vault, compliance, audit, governance |
 | 💼 **MiaKkcar** | Product & Customer Experience Director | UI/UX, branding, marketplace, customer onboarding, product strategy |
+| 🎬 **Zeruiah** | Manager & Executive Producer | Zeruiah social platform + reality TV show, content/production, talent, campaigns |
+| 🛠 **Don Colion** | Special Ops Developer | Rapid prototypes, R&D spikes, incident hotfixes, custom tooling |
 
 ## Organization chart
 
@@ -26,16 +28,19 @@
                                  │
                         Lucy  (Chief Orchestrator)
                                  │
-        ┌────────────────────────┼────────────────────────┐
-        │                        │                         │
-     Julian                JABBNETWORKS                  Kaira
- (Architecture)         (Platform Operations)     (Security & Governance)
-        │                        │
-   ┌────┼─────┐             ┌────┼──────┐
-   │    │     │             │    │      │
-  Alex Brianna Bianca      Ryan Christina MiaKkcar
- (RPA) (Apps) (Pages/BI)  (Fabric) (QA)  (Product)
+   ┌────────────┬────────────┼────────────┬────────────┐
+   │            │            │            │            │
+ Julian    JABBNETWORKS    Kaira      Zeruiah    Don Colion
+(Arch.)  (Platform Ops)  (Security)  (Producer) (Special Ops)
+   │            │
+┌──┼───┐    ┌───┼─────┐
+│  │   │    │   │     │
+Alex … …   Ryan Christina MiaKkcar
 ```
+
+Alex/Brianna/Bianca report to **Julian**; Ryan/Christina/MiaKkcar report to
+**JABBNETWORKS**; **Kaira**, **Zeruiah** (media), and **Don Colion** (special ops)
+report directly to **Lucy**.
 
 ## Reporting & escalation lines
 
@@ -55,6 +60,8 @@ first, then up to Lucy.
 | Ryan (MB-006) | **JABBNETWORKS** | Lucy → human |
 | Christina (MB-008) | **JABBNETWORKS** | Lucy → human |
 | MiaKkcar (MB-010) | **JABBNETWORKS** | Lucy → human |
+| Zeruiah (MB-011) | Lucy | human |
+| Don Colion (MB-012) | Lucy | human |
 
 This hierarchy is encoded in the kernel at
 [`kernel/motherbridge/org.py`](../../kernel/motherbridge/org.py)
