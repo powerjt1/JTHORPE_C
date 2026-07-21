@@ -55,7 +55,21 @@
           '<span class="a-stxt ' + sc + '">' + statusLabel(a.status) + '</span></div>' +
         '<div class="a-time">' + new Date().toLocaleTimeString() + '</div>' +
       '</div>' +
+      '<div class="a-actions">' +
+        '<button class="a-btn a-speak" type="button" title="Hear ' + esc(a.name) + '">🔊 Speak</button>' +
+        '<a class="a-btn a-chat" href="workspace.html?agent=' + a.id + '" title="Chat with ' + esc(a.name) + '">💬 Chat</a>' +
+      '</div>' +
       '<div class="a-check">✓</div>';
+    var speakBtn = card.querySelector(".a-speak");
+    if (speakBtn) {
+      if (!(window.AIOSVoice && window.AIOSVoice.ttsSupported)) {
+        speakBtn.style.display = "none";
+      } else {
+        speakBtn.addEventListener("click", function () {
+          window.AIOSVoice.speak(a.id, a.name + " here — " + a.role + ". Checked in and ready to work.");
+        });
+      }
+    }
     el("assemblyGrid").appendChild(card);
     setTimeout(function () { card.classList.add("in"); }, 40);
   }

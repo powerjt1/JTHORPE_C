@@ -82,6 +82,8 @@
                 <strong id="wsName">—</strong>
                 <em id="wsTitle">—</em>
               </div>
+              <button class="ws-spk" id="wsSpeak" type="button" aria-pressed="true"
+                      title="Toggle voice">🔊</button>
               <span class="ws-c-status" id="wsStatus">idle</span>
             </header>
 
@@ -105,6 +107,7 @@
             <!-- Ask console -->
             <div class="ws-chat" id="wsChat"></div>
             <form class="ws-ask" id="wsAskForm">
+              <button class="ws-mic" id="wsMic" type="button" title="Speak your question" hidden>🎤</button>
               <input id="wsAskInput" type="text" autocomplete="off"
                      placeholder="Ask this agent about their work…" maxlength="500" />
               <button type="submit" class="btn">Ask</button>
@@ -135,6 +138,7 @@
 
   <script src="aios-config.js" defer></script>
   <script src="js/main.js" defer></script>
+  <script src="js/voice.js" defer></script>
   <script src="js/workspace.js" defer></script>
 </body>
 </html>

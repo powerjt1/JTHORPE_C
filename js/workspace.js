@@ -134,6 +134,7 @@
 
   // ---- Console ----
   var current = null;
+  var speakOn = true;
   function openConsole(id) {
     var a = BY_ID[id];
     if (!a) return;
@@ -221,9 +222,14 @@
     if (el("wsStatus")) { el("wsStatus").textContent = "working"; el("wsStatus").classList.add("working"); }
     var typing = bubble("agent typing", current.name + " is thinking…");
 
+    var speakerId = current.id;
     var done = function (text, simulated) {
       typing.remove();
-      bubble("agent", text);
+      var b = bubble("agent", text);
+      b.title = "Click to hear again";
+      b.style.cursor = "pointer";
+      b.addEventListener("click", function () { if (window.AIOSVoice) window.AIOSVoice.speak(speakerId, text); });
+      if (speakOn && window.AIOSVoice) window.AIOSVoice.speak(speakerId, text);
       if (el("wsStatus")) { el("wsStatus").textContent = "online"; el("wsStatus").classList.remove("working"); }
       if (el("wsSimNote")) el("wsSimNote").hidden = !simulated;
     };
@@ -238,6 +244,41 @@
   }
 
   if (el("wsAskForm")) el("wsAskForm").addEventListener("submit", function (e) { e.preventDefault(); submit(); });
+
+  // ---- Voice: speaker toggle + mic dictation ----
+  var speakBtn = el("wsSpeak");
+  if (speakBtn) {
+    if (!(window.AIOSVoice && window.AIOSVoice.ttsSupported)) {
+      speakBtn.hidden = true;
+    } else {
+      speakBtn.addEventListener("click", function () {
+        speakOn = !speakOn;
+        speakBtn.textContent = speakOn ? "🔊" : "🔇";
+        speakBtn.setAttribute("aria-pressed", speakOn ? "true" : "false");
+        window.AIOSVoice.setEnabled(speakOn);
+      });
+    }
+  }
+  var micBtn = el("wsMic");
+  if (micBtn && window.AIOSVoice && window.AIOSVoice.sttSupported) {
+    micBtn.hidden = false;
+    micBtn.addEventListener("click", function () {
+      micBtn.classList.add("listening"); micBtn.textContent = "🔴";
+      window.AIOSVoice.listen(
+        function (t) { if (el("wsAskInput")) el("wsAskInput").value = t; },
+        function () {
+          micBtn.classList.remove("listening"); micBtn.textContent = "🎤";
+          if (el("wsAskInput") && el("wsAskInput").value.trim()) submit();
+        }
+      );
+    });
+  }
+
+  // ---- Deep link: ?agent=<id> opens that console ----
+  try {
+    var a0 = new URLSearchParams(window.location.search).get("agent");
+    if (a0 && BY_ID[a0.toLowerCase()]) openConsole(a0.toLowerCase());
+  } catch (e) { /* no-op */ }
 
   // ---- Live sync (engaged agents + recent activity) ----
   if (CONFIG.backendEnabled) {

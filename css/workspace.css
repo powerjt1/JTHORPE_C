@@ -104,7 +104,16 @@
 .ws-bub.me { align-self: flex-end; background: linear-gradient(90deg, #7c5cff, #6d5cf0); color: #fff; border-bottom-right-radius: 4px; }
 .ws-bub.agent { align-self: flex-start; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09); border-bottom-left-radius: 4px; }
 .ws-bub.typing { color: var(--muted, #9aa4bf); font-style: italic; }
+.ws-spk { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
+  width: 32px; height: 30px; cursor: pointer; font-size: 0.95rem; line-height: 1; }
+.ws-spk[aria-pressed="false"] { opacity: 0.5; }
+.ws-spk:hover { border-color: rgba(34,211,238,0.6); }
 .ws-ask { display: flex; gap: 8px; }
+.ws-mic { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px;
+  width: 40px; cursor: pointer; font-size: 1rem; flex: none; }
+.ws-mic:hover { border-color: rgba(34,211,238,0.6); }
+.ws-mic.listening { border-color: #ff6b6b; box-shadow: 0 0 10px rgba(255,107,107,0.4); animation: micpulse 1s ease-in-out infinite; }
+@keyframes micpulse { 0%,100% { box-shadow: 0 0 6px rgba(255,107,107,0.3); } 50% { box-shadow: 0 0 14px rgba(255,107,107,0.6); } }
 .ws-ask input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 9px 12px; color: #eaf0ff; font-size: 0.86rem; }
 .ws-ask input:focus { outline: none; border-color: rgba(34,211,238,0.7); }
 .ws-ask .btn { padding: 9px 16px; }

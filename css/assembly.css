@@ -48,6 +48,13 @@
 .a-stxt.offline { color: #5c6580; }
 .a-time { font-size: 0.72rem; color: #5c6580; margin-top: 10px; text-align: right; }
 
+.a-actions { display: flex; gap: 8px; margin-top: 12px; }
+.a-btn { flex: 1; text-align: center; text-decoration: none; font-size: 0.78rem; font-weight: 600;
+  padding: 7px 8px; border-radius: 8px; cursor: pointer;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #c9d3ee; }
+.a-btn:hover { border-color: rgba(34,211,238,0.55); color: #eaf0ff; background: rgba(34,211,238,0.08); }
+.a-chat { background: linear-gradient(90deg, rgba(124,92,255,0.18), rgba(34,211,238,0.14)); }
+
 .a-check { position: absolute; top: 12px; right: 12px; width: 22px; height: 22px; border-radius: 50%;
   background: rgba(34,211,238,0.18); border: 1px solid rgba(34,211,238,0.5); color: #22d3ee;
   display: grid; place-items: center; font-size: 0.7rem; animation: aPop 0.4s ease-out; }
