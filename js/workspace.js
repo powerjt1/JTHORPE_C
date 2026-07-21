@@ -21,10 +21,18 @@
     { id: "bianca",    name: "Bianca",       title: "Portal & Analytics Architect",     artifact: "dashboards.pbix",    inputs: ["app", "semantic model"],           outputs: ["dashboards", "portal"] },
     { id: "christina", name: "Christina",    title: "QA & DevOps Director",             artifact: "test-report.xml",    inputs: ["app", "flows"],                    outputs: ["test report", "release"] },
     { id: "kaira",     name: "Kaira",        title: "Security & Governance Director",   artifact: "security-scan.sarif",inputs: ["release candidate"],               outputs: ["security scan", "sign-off"] },
-    { id: "miakkcar",  name: "MiaKkcar",     title: "Product & CX Director",            artifact: "launch-plan.md",     inputs: ["validated release"],               outputs: ["launch plan", "UX polish"] }
+    { id: "miakkcar",  name: "MiaKkcar",     title: "Product & CX Director",            artifact: "launch-plan.md",     inputs: ["validated release"],               outputs: ["launch plan", "UX polish"] },
+    // Non-pipeline agents (media/music) — chat/voice, but not on the delivery canvas.
+    { id: "zeruiah",   name: "Zeruiah",      title: "Manager & Executive Producer", pipeline: false, inputs: ["brand goals", "story ideas"], outputs: ["content calendar", "episode plans"] },
+    { id: "don-colion", name: "Don Colion",  title: "Music Producer",               pipeline: false, inputs: ["briefs", "reference tracks"], outputs: ["masters", "stems", "beats"] }
   ];
   var BY_ID = {};
   AGENTS.forEach(function (a, i) { a.index = i; BY_ID[a.id] = a; });
+  // Only these 10 render on the canvas / take part in the hand-off animation.
+  var PIPELINE = AGENTS.filter(function (a) { return a.pipeline !== false; });
+  function pipelineNext(a) {
+    return (a.pipeline !== false && a.index < PIPELINE.length - 1) ? PIPELINE[a.index + 1] : null;
+  }
 
   function el(id) { return document.getElementById(id); }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) {
@@ -40,7 +48,7 @@
   var stage = el("wsStage");
   var wires = el("wsWires");
   var nodes = [];
-  AGENTS.forEach(function (a) {
+  PIPELINE.forEach(function (a) {
     var row = Math.floor(a.index / 5);
     var col = row === 0 ? a.index : (4 - (a.index - 5)); // reverse row 2 -> snake
     var n = document.createElement("button");
@@ -93,9 +101,9 @@
     if (l) l.setAttribute("class", "ws-wire" + (on ? " hot" : ""));
   }
   function loop() {
-    var from = step % (AGENTS.length - 1);
+    var from = step % (PIPELINE.length - 1);
     var to = from + 1;
-    var a = AGENTS[from], b = AGENTS[to];
+    var a = PIPELINE[from], b = PIPELINE[to];
     packet.textContent = a.artifact;
     // start at source
     positionPacket(nodes[from]);
@@ -144,11 +152,12 @@
     el("wsAvatar").src = "assets/avatars/" + a.id + ".png";
     el("wsName").textContent = a.name;
     el("wsTitle").textContent = a.title;
-    el("wsInputs").innerHTML = a.inputs.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("");
-    el("wsOutputs").innerHTML = a.outputs.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("");
-    el("wsArtifact").textContent = a.artifact;
-    var next = AGENTS[a.index + 1];
-    el("wsNext").textContent = next ? " → " + next.name : " → delivery";
+    el("wsInputs").innerHTML = (a.inputs || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("");
+    el("wsOutputs").innerHTML = (a.outputs || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("");
+    el("wsArtifact").textContent = a.artifact || "—";
+    var next = pipelineNext(a);
+    el("wsNext").textContent = next ? " → " + next.name
+                              : (a.pipeline === false ? " (collaborates across the team)" : " → delivery");
     el("wsChat").innerHTML = "";
     addSuggestions(a);
     var input = el("wsAskInput");
@@ -179,9 +188,9 @@
 
   // Local grounded answer (mirrors backend/src/agentinfo.answer).
   function composeLocal(a, q) {
-    var next = AGENTS[a.index + 1];
-    var handoff = next ? " When my part is done I hand " + a.artifact + " to " + next.name + "."
-                       : " I coordinate the whole team to bring it together.";
+    var next = pipelineNext(a);
+    var handoff = (next && a.artifact) ? (" When my part is done I hand " + a.artifact + " to " + next.name + ".")
+                                       : "";
     var ql = q.toLowerCase(), body;
     if (!q) body = "Ask me anything about my work.";
     else if (/\b(what|which)\b.*\b(do|handle|own)/.test(ql) || /your (job|role)/.test(ql))

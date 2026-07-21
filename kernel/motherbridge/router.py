@@ -14,8 +14,8 @@ _RULES: list[tuple[str, tuple[str, ...]]] = [
     ("MB-010", ("product", "strategy", "customer", "roadmap", "requirement", "ux research")),
     ("MB-011", ("social media", "reality tv", "production", "producer", "content",
                 "campaign", "episode", "influencer", "audience", "brand")),
-    ("MB-012", ("special ops", "prototype", "proof of concept", "poc", "spike",
-                "hotfix", "rapid", "r&d", "experiment", "incident")),
+    ("MB-012", ("music", "beat", "track", "song", "mix", "master", "record",
+                "studio", "album", "single", "soundtrack", "artist")),
 ]
 
 

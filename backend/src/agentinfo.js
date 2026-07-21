@@ -93,6 +93,21 @@ var INFO = {
     inputs: ["validated release"],
     outputs: ["launch plan", "UX polish", "success metrics"],
     tools: ["product analytics", "UX research", "roadmap"]
+  },
+  // Non-pipeline agents (media/music) — outside the 10-step delivery flow.
+  zeruiah: {
+    name: "Zeruiah", title: "Manager & Executive Producer",
+    focus: "content, production, and audience for the Zeruiah social platform and reality TV show",
+    inputs: ["brand goals", "story ideas"],
+    outputs: ["content calendar", "episode plans", "campaigns"],
+    tools: ["social platforms", "streaming", "audience analytics"]
+  },
+  "don-colion": {
+    name: "Don Colion", title: "Music Producer",
+    focus: "producing beats, records, and soundtracks and developing artists",
+    inputs: ["briefs", "reference tracks"],
+    outputs: ["masters", "stems", "beats"],
+    tools: ["DAW", "mixing", "mastering"]
   }
 };
 
@@ -116,9 +131,9 @@ function answer(id, question) {
   var q = String(question || "").trim();
   var next = nextOf(id);
   var nextName = next && INFO[next] ? INFO[next].name : null;
-  var handoff = nextName
-    ? " When my part is done I hand " + artifactOf(id) + " to " + nextName + "."
-    : " I coordinate the whole team to bring it together.";
+  var handoff = (artifactOf(id) && nextName)
+    ? (" When my part is done I hand " + artifactOf(id) + " to " + nextName + ".")
+    : "";
 
   var opener = a.name + " here — " + a.title + ". ";
   var role = "I focus on " + a.focus + ". ";
@@ -153,8 +168,9 @@ function systemPrompt(id) {
     "You focus on " + a.focus + ".",
     "Your typical inputs are " + a.inputs.join(", ") + "; you deliver " + a.outputs.join(", ") +
       "; you work with " + a.tools.join(", ") + ".",
-    nextName ? ("When your part is done you hand " + artifactOf(id) + " to " + nextName + ".")
-             : "You coordinate the whole team to bring the work together.",
+    (artifactOf(id) && nextName)
+      ? ("When your part is done you hand " + artifactOf(id) + " to " + nextName + ".")
+      : "You collaborate with the team as the work requires.",
     "Reply in first person as this agent, concise (2-4 sentences), practical and grounded in your role.",
     "Never reveal or invent secrets or credentials — reference them by name only. Mutating or high-impact actions require human approval; you can propose, not authorize."
   ].join(" ");
@@ -168,7 +184,9 @@ module.exports = {
   answer: answer,
   systemPrompt: systemPrompt,
   list: function () {
-    return WORKFLOW.map(function (w) {
+    var inFlow = {};
+    WORKFLOW.forEach(function (w) { inFlow[w.id] = true; });
+    var out = WORKFLOW.map(function (w) {
       var a = INFO[w.id];
       return {
         id: w.id, name: a.name, title: a.title, focus: a.focus,
@@ -176,5 +194,16 @@ module.exports = {
         artifact: w.artifact, next: nextOf(w.id)
       };
     });
+    // Append non-pipeline agents (e.g. Zeruiah, Don Colion).
+    Object.keys(INFO).forEach(function (id) {
+      if (inFlow[id]) return;
+      var a = INFO[id];
+      out.push({
+        id: id, name: a.name, title: a.title, focus: a.focus,
+        inputs: a.inputs, outputs: a.outputs, tools: a.tools,
+        artifact: null, next: null
+      });
+    });
+    return out;
   }
 };

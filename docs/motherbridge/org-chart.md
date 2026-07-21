@@ -19,7 +19,7 @@
 | 🛡 **Kaira** | Security & Governance Director | Microsoft Entra ID, RBAC, Key Vault, compliance, audit, governance |
 | 💼 **MiaKkcar** | Product & Customer Experience Director | UI/UX, branding, marketplace, customer onboarding, product strategy |
 | 🎬 **Zeruiah** | Manager & Executive Producer | Zeruiah social platform + reality TV show, content/production, talent, campaigns |
-| 🛠 **Don Colion** | Special Ops Developer | Rapid prototypes, R&D spikes, incident hotfixes, custom tooling |
+| 🎧 **Don Colion** | Music Producer | Beats, records, mixing/mastering, artist development, soundtrack |
 
 ## Organization chart
 
@@ -31,7 +31,7 @@
    ┌────────────┬────────────┼────────────┬────────────┐
    │            │            │            │            │
  Julian    JABBNETWORKS    Kaira      Zeruiah    Don Colion
-(Arch.)  (Platform Ops)  (Security)  (Producer) (Special Ops)
+(Arch.)  (Platform Ops)  (Security)  (Producer)  (Music)
    │            │
 ┌──┼───┐    ┌───┼─────┐
 │  │   │    │   │     │
@@ -39,7 +39,7 @@ Alex … …   Ryan Christina MiaKkcar
 ```
 
 Alex/Brianna/Bianca report to **Julian**; Ryan/Christina/MiaKkcar report to
-**JABBNETWORKS**; **Kaira**, **Zeruiah** (media), and **Don Colion** (special ops)
+**JABBNETWORKS**; **Kaira**, **Zeruiah** (media), and **Don Colion** (music)
 report directly to **Lucy**.
 
 ## Reporting & escalation lines

@@ -39,8 +39,9 @@ function ok(name, cond) { console.log((cond ? "PASS" : "FAIL") + " " + name); if
   // --- /agents ---
   var ag = await (await fetch(BASE + "/agents")).json();
   ok("GET /agents ok", ag.ok === true);
-  ok("10 agents", ag.agents.length === 10);
+  ok("12 agents (10 pipeline + 2 non-pipeline)", ag.agents.length === 12);
   ok("workflow has 10 steps", ag.workflow.length === 10);
+  ok("don-colion present as Music Producer", ag.agents.some(function (a) { return a.id === "don-colion" && a.title === "Music Producer"; }));
   ok("first agent lucy w/ artifact", ag.agents[0].id === "lucy" && ag.agents[0].artifact === "project-brief.md");
   ok("agents carry inputs/outputs", Array.isArray(ag.agents[0].inputs) && Array.isArray(ag.agents[0].outputs));
 

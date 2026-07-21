@@ -11,5 +11,7 @@ module.exports = [
   { id: "bianca",    name: "Bianca",       title: "Portal & Analytics Architect" },
   { id: "christina", name: "Christina",    title: "QA & DevOps Director" },
   { id: "kaira",     name: "Kaira",        title: "Security & Governance Director" },
-  { id: "miakkcar",  name: "MiaKkcar",     title: "Product & Customer Experience Director" }
+  { id: "miakkcar",  name: "MiaKkcar",     title: "Product & Customer Experience Director" },
+  { id: "zeruiah",   name: "Zeruiah",      title: "Manager & Executive Producer" },
+  { id: "don-colion", name: "Don Colion",  title: "Music Producer" }
 ];

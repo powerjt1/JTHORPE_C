@@ -21,7 +21,9 @@
     { id: "jabb",      name: "JABBNETWORKS", role: "Platform Operations Architect",    emoji: "🌐", status: "active" },
     { id: "christina", name: "Christina",    role: "QA & DevOps Director",             emoji: "🔧", status: "active" },
     { id: "kaira",     name: "Kaira",        role: "Security & Governance Director",   emoji: "🛡️", status: "active" },
-    { id: "miakkcar",  name: "MiaKkcar",     role: "Product & CX Director",            emoji: "✨", status: "active" }
+    { id: "miakkcar",  name: "MiaKkcar",     role: "Product & CX Director",            emoji: "✨", status: "active" },
+    { id: "zeruiah",   name: "Zeruiah",      role: "Manager & Executive Producer",     emoji: "🎬", status: "active" },
+    { id: "don-colion", name: "Don Colion",  role: "Music Producer",                   emoji: "🎧", status: "active" }
   ];
 
   var STAGGER_MS = 380;
