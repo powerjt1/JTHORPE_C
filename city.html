@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent City — JABBNETWORKS AIOS</title>
+<meta name="description" content="JABBNETWORKS AIOS Agent City — the 12-agent team as a living 3D city. Each district is an agent in its own environment; the wires overhead are live hand-offs between them. Powered by JABB Networks.">
+<meta name="theme-color" content="#040406">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#040406;--txt:#e9e9ea;--dim:#83858b;--edge:rgba(255,255,255,.09);
+  --amber:#e8791a;--amber2:#ffb347;--live:#3ddc84;--warn:#ffc53d;--fail:#ff5f56;
+  --silver:linear-gradient(180deg,#fff 0%,#b9bcc4 60%,#8b8f98 100%);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--ink);color:var(--txt);
+  font-family:'IBM Plex Sans',system-ui,sans-serif;font-weight:300}
+#city{position:fixed;inset:0}
+canvas{display:block}
+a{color:inherit;text-decoration:none}
+
+.hud{position:fixed;inset:0;pointer-events:none;z-index:10}
+.hud>*{pointer-events:auto}
+.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--edge);border-radius:999px;
+  padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--dim);background:rgba(255,255,255,.03);backdrop-filter:blur(10px)}
+.pill b{color:var(--txt);font-weight:500;font-variant-numeric:tabular-nums}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--live);animation:ping 2.4s ease-out infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(61,220,132,.5)}70%{box-shadow:0 0 0 8px rgba(61,220,132,0)}100%{box-shadow:0 0 0 0 rgba(61,220,132,0)}}
+
+.mast{position:absolute;top:20px;left:22px;display:flex;gap:13px;align-items:center}
+.mono{width:42px;height:42px;border-radius:11px;border:1px solid var(--edge);position:relative;
+  background:linear-gradient(150deg,rgba(255,255,255,.08),rgba(255,255,255,.01));
+  display:grid;place-items:center;font-family:'Playfair Display',serif;font-weight:700;font-size:15px}
+.mono span{background:var(--silver);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mono::after{content:'';position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,var(--amber2),var(--amber));box-shadow:0 0 14px rgba(232,121,26,.85)}
+.word{font-family:'Playfair Display',serif;font-size:20px;line-height:1}
+.word .j{background:var(--silver);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+.word .n{background:linear-gradient(90deg,var(--amber),var(--amber2));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+.tag{display:block;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--dim);margin-top:5px}
+.sitenav{position:absolute;top:26px;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.sitenav a{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dim);padding:6px 11px;border:1px solid var(--edge);border-radius:999px;background:rgba(8,8,10,.6);backdrop-filter:blur(10px)}
+.sitenav a:hover{color:var(--txt);border-color:rgba(255,255,255,.22)}
+.sitenav a.here{color:var(--amber2);border-color:rgba(232,121,26,.4);background:rgba(232,121,26,.12)}
+
+.readout{position:absolute;top:20px;right:22px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:52vw}
+
+.index{position:absolute;top:78px;right:22px;width:230px;border:1px solid var(--edge);border-radius:13px;
+  background:rgba(8,8,10,.72);backdrop-filter:blur(16px);overflow:hidden}
+.index h3{margin:0;padding:10px 13px;border-bottom:1px solid var(--edge);
+  font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--dim);font-weight:400}
+.index ul{list-style:none;margin:0;padding:5px;max-height:min(52vh,460px);overflow-y:auto}
+.index li button{width:100%;display:flex;align-items:center;gap:9px;background:none;border:0;
+  padding:6px 8px;border-radius:7px;cursor:pointer;color:var(--dim);font:inherit;font-size:12px;text-align:left}
+.index li button:hover{background:rgba(255,255,255,.05);color:var(--txt)}
+.index li button.on{background:rgba(232,121,26,.13);color:var(--amber2)}
+.index i{width:7px;height:7px;border-radius:2px;flex:none}
+.index .h{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;opacity:.7}
+
+.intro{position:absolute;left:22px;bottom:26px;max-width:350px}
+.intro h1{font-family:'Playfair Display',serif;font-weight:500;font-size:clamp(26px,3.3vw,40px);
+  margin:0;line-height:1.03;letter-spacing:-.5px}
+.intro h1 em{font-style:italic;background:linear-gradient(90deg,var(--amber),var(--amber2));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.intro p{color:var(--dim);font-size:13px;line-height:1.6;margin:11px 0 0}
+.hint{margin-top:13px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:#55575d}
+
+.panel{position:absolute;left:22px;bottom:26px;width:min(360px,84vw);border:1px solid rgba(232,121,26,.32);
+  border-radius:14px;background:rgba(8,8,10,.88);backdrop-filter:blur(18px);padding:17px;display:none;
+  max-height:calc(100vh - 130px);overflow-y:auto}
+.panel.on{display:block;animation:in .26s ease}
+@keyframes in{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.panel .x{position:absolute;top:13px;right:13px;background:none;border:1px solid var(--edge);color:var(--dim);
+  width:26px;height:26px;border-radius:7px;cursor:pointer;line-height:1}
+.panel .x:hover{color:var(--txt)}
+.phead{display:flex;gap:12px;align-items:center}
+.phead .av{width:52px;height:52px;border-radius:12px;object-fit:cover;border:1px solid var(--edge);flex:none}
+.panel .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.2em;
+  text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.panel h2{font-family:'Playfair Display',serif;font-weight:500;font-size:21px;margin:6px 0 0;line-height:1.1}
+.panel .env{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--amber2);margin-top:4px}
+.panel .role{font-size:12.5px;color:var(--dim);margin-top:11px;line-height:1.55}
+.sec{margin-top:16px}
+.sec h4{margin:0 0 9px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--dim);font-weight:400}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:12.5px;
+  border-bottom:1px solid rgba(255,255,255,.05)}
+.kv span:first-child{color:var(--dim)}
+.kv span:last-child{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+.crew{display:flex;flex-wrap:wrap;gap:6px}
+.crew span{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:4px 8px;border-radius:6px;
+  border:1px solid var(--edge);color:var(--dim)}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:7px 0 7px 27px;font-size:12.5px;
+  color:var(--dim);border-left:1px solid var(--edge);margin-left:6px;line-height:1.5}
+.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:-9px;top:8px;
+  width:18px;height:18px;border-radius:50%;background:#0a0a0c;border:1px solid var(--edge);
+  font-family:'IBM Plex Mono',monospace;font-size:8px;display:grid;place-items:center;color:var(--dim)}
+.steps li.done{color:var(--txt)}
+.steps li.done::before{border-color:rgba(61,220,132,.5);color:var(--live)}
+.steps li.now{color:var(--txt)}
+.steps li.now::before{border-color:var(--amber);color:var(--amber2);box-shadow:0 0 10px rgba(232,121,26,.5)}
+
+.log{position:absolute;right:22px;bottom:26px;width:min(340px,40vw);border:1px solid var(--edge);
+  border-radius:13px;background:rgba(8,8,10,.72);backdrop-filter:blur(16px);overflow:hidden}
+.log-h{padding:9px 13px;border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:8px;
+  font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.log ul{list-style:none;margin:0;padding:6px 0;max-height:132px;overflow:hidden}
+.log li{font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 13px;display:flex;gap:8px;
+  white-space:nowrap;animation:slide .4s ease}
+.log li .t{color:#55575d}
+.log li .r{overflow:hidden;text-overflow:ellipsis}
+.log li i{font-style:normal;color:var(--amber2)}
+.log li.err i{color:var(--fail)}
+@keyframes slide{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
+
+.controls{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:7px}
+.controls button{border:1px solid var(--edge);background:rgba(8,8,10,.7);backdrop-filter:blur(10px);
+  color:var(--dim);border-radius:999px;padding:7px 14px;font-family:'IBM Plex Mono',monospace;
+  font-size:10px;letter-spacing:.11em;text-transform:uppercase;cursor:pointer}
+.controls button:hover{color:var(--txt);border-color:rgba(255,255,255,.22)}
+.controls button.on{background:rgba(232,121,26,.14);border-color:rgba(232,121,26,.4);color:var(--amber2)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+.loading{position:fixed;inset:0;display:grid;place-items:center;background:var(--ink);z-index:60;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+.loading.gone{opacity:0;pointer-events:none;transition:opacity .6s}
+.nowebgl{position:fixed;inset:0;display:none;place-items:center;text-align:center;padding:24px;background:var(--ink);z-index:70}
+.nowebgl.on{display:grid}
+
+@media(max-width:1000px){.index{display:none}.log{display:none}.sitenav{display:none}}
+@media(max-width:640px){.readout .pill:nth-child(n+4){display:none}.controls{display:none}}
+</style>
+</head>
+<body>
+<div id="city"></div>
+<div class="loading" id="loading">Raising the city…</div>
+<div class="nowebgl" id="nowebgl"><div>
+  <p style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim);letter-spacing:.1em">
+    This 3D city needs WebGL.<br>Try a desktop browser with hardware acceleration on.</p>
+  <p><a href="assembly.html" style="color:var(--amber2)">← Back to the Assembly</a></p>
+</div></div>
+
+<div class="hud">
+  <a class="mast" href="index.html" aria-label="Lucy AI home">
+    <div class="mono"><span>JN</span></div>
+    <div>
+      <div class="word"><span class="j">JABB</span> <span class="n">NETWORKS</span></div>
+      <span class="tag">Agent City · AIOS HQ</span>
+    </div>
+  </a>
+
+  <nav class="sitenav" aria-label="Site">
+    <a href="index.html">Home</a>
+    <a href="assembly.html">Assembly</a>
+    <a href="workspace.html">Workspace</a>
+    <a href="city.html" class="here">City</a>
+    <a href="command-center.html">Command Center</a>
+  </nav>
+
+  <div class="readout">
+    <span class="pill"><span class="dot"></span> City live</span>
+    <span class="pill">Agents <b id="mD">0</b></span>
+    <span class="pill">Sub-agents <b id="mA">0</b></span>
+    <span class="pill">Routes <b id="mR">0</b></span>
+    <span class="pill">In flight <b id="mF">0</b></span>
+  </div>
+
+  <nav class="index">
+    <h3>Agent districts</h3>
+    <ul id="idx"></ul>
+  </nav>
+
+  <div class="intro" id="intro">
+    <h1>Twelve agents. Twelve <em>environments</em>. One city.</h1>
+    <p>Every tower is an AIOS agent working in its own environment — orchestration, architecture, apps, flows, data, platform ops, QA, security, product, media, music. The wires overhead are live hand-offs between them.</p>
+    <div class="hint">Drag to orbit · scroll to zoom · click a tower</div>
+  </div>
+
+  <div class="panel" id="panel">
+    <button class="x" id="panelX" aria-label="Close agent detail">&times;</button>
+    <div class="phead">
+      <img class="av" id="pAv" alt="" src="">
+      <div>
+        <div class="eyebrow" id="pEyebrow"></div>
+        <h2 id="pName"></h2>
+        <div class="env" id="pEnv"></div>
+      </div>
+    </div>
+    <div class="role" id="pRole"></div>
+    <div class="sec"><h4>Crew</h4><div class="crew" id="pCrew"></div></div>
+    <div class="sec"><h4>Workflow</h4><ol class="steps" id="pSteps"></ol></div>
+    <div class="sec"><h4>Vitals</h4><div id="pVitals"></div></div>
+  </div>
+
+  <div class="log">
+    <div class="log-h"><span class="dot"></span> Inter-agent traffic</div>
+    <ul id="logList"></ul>
+  </div>
+
+  <div class="controls">
+    <button id="bSpin" class="on">Auto-orbit</button>
+    <button id="bWires" class="on">Wires</button>
+    <button id="bReset">Reset view</button>
+  </div>
+</div>
+
+<script src="assets/vendor/three.min.js"></script>
+<script>
+/* ============ AGENT DISTRICTS (the 12-agent AIOS roster) ============ */
+const D=[
+ {id:'HQ',av:'lucy',name:'Lucy · Orchestration Spire',color:0xffb347,env:'Control Plane',
+  role:'Chief AI Orchestrator. Reads intent, plans the work, routes each task to the agent who owns it, holds the quality gate, and keeps a human in the loop.',
+  crew:['Intake Triage','Router','Capacity Planner','Quality Gate'],
+  steps:['Receive request','Plan the work','Route to agent','Hold quality gate','Release to client'],now:2,
+  agents:5,runs:8420,uptime:99.98},
+ {id:'JUL',av:'julian',name:'Julian · Architecture Heights',color:0x8b7cff,env:'Design Studio',
+  role:'Enterprise Solution Architect. Owns the solution architecture, integration patterns, environments, and the ALM spine.',
+  crew:['Solution Design','Integration Patterns','ALM'],
+  steps:['Read the brief','Design architecture','Define integrations','Set ALM plan','Hand to platform'],now:2,
+  agents:3,runs:2110,uptime:99.90},
+ {id:'JABB',av:'jabb',name:'JABBNETWORKS · Platform Ops Yard',color:0x3ddc84,env:'Prod Ops',
+  role:'Platform Operations Architect. Provisions environments and connections, configures Azure, and keeps the platform healthy.',
+  crew:['Env Provisioning','Connections','Monitoring'],
+  steps:['Provision environments','Wire connections','Apply DLP','Monitor health','Report status'],now:3,
+  agents:4,runs:5510,uptime:99.94},
+ {id:'RYAN',av:'ryan',name:'Ryan · Fabric & Data Docks',color:0x5aa9ff,env:'Microsoft Fabric',
+  role:'Data & Fabric Architect. Builds the lakehouse, semantic models, and pipelines that feed the whole city.',
+  crew:['Lakehouse','Semantic Model','Dataflows'],
+  steps:['Model the data','Build lakehouse','Create semantic model','Wire pipelines','Publish datasets'],now:2,
+  agents:3,runs:640,uptime:99.99},
+ {id:'ALEX',av:'alex',name:'Alex · Automation Foundry',color:0xe8791a,env:'Power Automate',
+  role:'Automation Architect. Designs cloud flows, RPA, and Azure Functions — triggers, error scopes, retries.',
+  crew:['Flow Design','RPA','Functions'],
+  steps:['Pick trigger','Build flow','Wrap error scopes','Set retry policy','Publish'],now:3,
+  agents:4,runs:5842,uptime:99.91},
+ {id:'BRI',av:'brianna',name:'Brianna · Power Apps Works',color:0xffc53d,env:'Power Apps',
+  role:'Power Apps Architect. Canvas and model-driven apps — screens, forms, Power Fx, accessibility.',
+  crew:['Canvas','Model-Driven','Power Fx','A11y'],
+  steps:['Read requirement','Draft screens','Bind data','Write Power Fx','A11y pass','Package'],now:3,
+  agents:4,runs:3110,uptime:99.88},
+ {id:'BIA',av:'bianca',name:'Bianca · Portal & Analytics Plaza',color:0xff8ad4,env:'Power BI / Pages',
+  role:'Portal & Analytics Architect. Power BI dashboards, Power Pages portals, and reporting.',
+  crew:['Power BI','Power Pages','Dashboards'],
+  steps:['Model report','Build dashboards','Stand up portal','Wire security','Publish'],now:2,
+  agents:3,runs:1477,uptime:99.62},
+ {id:'CHR',av:'christina',name:'Christina · Release Gate',color:0x9aa0a6,env:'Azure DevOps',
+  role:'QA & DevOps Director. Testing, CI/CD, environment promotion, pipeline gates, rollback plans.',
+  crew:['Testing','CI/CD','Release'],
+  steps:['Package solution','Run checker','Promote to UAT','Await approval','Deploy to prod'],now:3,
+  agents:3,runs:733,uptime:99.90},
+ {id:'KAI',av:'kaira',name:'Kaira · Entra Bastion',color:0xff5f56,env:'Entra / Purview',
+  role:'Security & Governance Director. Identity, DLP, secret rotation, compliance, least-privilege review.',
+  crew:['Identity','DLP','Governance'],
+  steps:['Register app','Scope permissions','Rotate secrets','Audit grants','Sign off'],now:2,
+  agents:3,runs:889,uptime:99.97},
+ {id:'MIA',av:'miakkcar',name:'MiaKkcar · Experience Boulevard',color:0xc0c4cc,env:'Product',
+  role:'Product & Customer Experience Director. UX, onboarding, roadmap, and launch experience.',
+  crew:['UX Research','Onboarding','Roadmap'],
+  steps:['Gather needs','Design experience','Plan launch','Polish UX','Measure success'],now:2,
+  agents:3,runs:1130,uptime:99.45},
+ {id:'ZER',av:'zeruiah',name:'Zeruiah · Studio District',color:0xffd166,env:'Media Studio',
+  role:'Manager & Executive Producer. The Zeruiah social platform + reality TV show — content, production, campaigns.',
+  crew:['Content','Production','Campaigns'],
+  steps:['Set the story','Plan the calendar','Produce episodes','Run campaigns','Measure audience'],now:2,
+  agents:4,runs:918,uptime:98.10},
+ {id:'DON',av:'don-colion',name:'Don Colion · Music Row',color:0xb388ff,env:'Music Studio',
+  role:'Music Producer. Beats, records, mixing and mastering, artist development, and soundtrack.',
+  crew:['Beats','Mixing','Mastering'],
+  steps:['Set the brief','Produce the beat','Record & comp','Mix & master','Deliver masters'],now:2,
+  agents:3,runs:1061,uptime:98.71}
+];
+const LINKS=[['HQ','JUL'],['HQ','JABB'],['HQ','RYAN'],['HQ','ALEX'],['HQ','BRI'],['HQ','BIA'],
+ ['HQ','CHR'],['HQ','KAI'],['HQ','MIA'],['HQ','ZER'],['HQ','DON'],
+ ['JUL','JABB'],['JABB','RYAN'],['RYAN','ALEX'],['ALEX','BRI'],['BRI','BIA'],['BIA','CHR'],
+ ['CHR','KAI'],['KAI','MIA'],['ZER','DON'],['ZER','MIA'],['JUL','KAI'],['CHR','JABB'],['BIA','RYAN']];
+const ROUTES=['/plan/route','/architecture/publish','/schema/upsert','/flow/publish','/app/package',
+ '/dashboard/refresh','/test/run','/security/scan','/launch/plan','/beat/render','/content/schedule','/token/refresh'];
+
+/* ============ SCENE ============ */
+const host=document.getElementById('city');
+let renderer;
+try{
+  renderer=new THREE.WebGLRenderer({antialias:true});
+}catch(e){}
+if(!renderer || !renderer.getContext){
+  document.getElementById('loading').classList.add('gone');
+  document.getElementById('nowebgl').classList.add('on');
+  throw new Error('WebGL unavailable');
+}
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x040406);
+scene.fog=new THREE.FogExp2(0x040406,0.011);
+
+const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,0.5,900);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+host.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0x6b7280,0.5));
+const key=new THREE.DirectionalLight(0xffb347,0.85);key.position.set(40,80,30);scene.add(key);
+const rim=new THREE.DirectionalLight(0x5aa9ff,0.35);rim.position.set(-50,30,-40);scene.add(rim);
+const core=new THREE.PointLight(0xe8791a,2.2,140);core.position.set(0,26,0);scene.add(core);
+
+const grid=new THREE.GridHelper(260,52,0x1a1a1e,0x111114);
+grid.material.transparent=true;grid.material.opacity=.5;scene.add(grid);
+const plate=new THREE.Mesh(new THREE.CircleGeometry(126,72),
+  new THREE.MeshStandardMaterial({color:0x08080a,roughness:.95,metalness:.1}));
+plate.rotation.x=-Math.PI/2;plate.position.y=-.06;scene.add(plate);
+const ring=new THREE.Mesh(new THREE.RingGeometry(124,126.5,90),
+  new THREE.MeshBasicMaterial({color:0xe8791a,transparent:true,opacity:.22,side:THREE.DoubleSide}));
+ring.rotation.x=-Math.PI/2;scene.add(ring);
+
+function windowTex(hex){
+  const c=document.createElement('canvas');c.width=64;c.height=128;
+  const x=c.getContext('2d');
+  x.fillStyle='#08080b';x.fillRect(0,0,64,128);
+  const col='#'+hex.toString(16).padStart(6,'0');
+  for(let r=0;r<21;r++)for(let q=0;q<7;q++){
+    if(Math.random()<0.42) continue;
+    x.globalAlpha=0.25+Math.random()*0.7;
+    x.fillStyle=Math.random()<0.15?'#ffffff':col;
+    x.fillRect(5+q*8,6+r*6,4,3);
+  }
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;return t;
+}
+function haloTex(){
+  const c=document.createElement('canvas');c.width=c.height=64;
+  const x=c.getContext('2d');
+  const g=x.createRadialGradient(32,32,0,32,32,32);
+  g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.35,'rgba(255,255,255,.35)');
+  g.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);
+}
+
+/* ============ CITY BUILD ============ */
+const towers=[],pickable=[];
+const R=54;
+D.forEach((d,i)=>{
+  const g=new THREE.Group();
+  let px=0,pz=0;
+  if(d.id!=='HQ'){
+    const a=((i-1)/(D.length-1))*Math.PI*2;
+    const rr=R*(i%3===0?1.16:i%3===1?0.86:1.0);
+    px=Math.cos(a)*rr; pz=Math.sin(a)*rr;
+  }
+  g.position.set(px,0,pz);
+  const isHQ=d.id==='HQ';
+  const h=isHQ?46:16+d.agents*3.4+(i%4)*2.6;
+  const w=isHQ?11:8.4, dp=isHQ?11:8.4;
+  const tex=windowTex(d.color);tex.repeat.set(2,Math.max(2,Math.round(h/7)));
+  const mat=new THREE.MeshStandardMaterial({color:0x0b0b0f,roughness:.72,metalness:.35,
+    emissive:new THREE.Color(d.color),emissiveMap:tex,emissiveIntensity:.85});
+  const body=new THREE.Mesh(new THREE.BoxGeometry(w,h,dp),mat);
+  body.position.y=h/2; g.add(body);
+  const eg=new THREE.LineSegments(new THREE.EdgesGeometry(body.geometry),
+    new THREE.LineBasicMaterial({color:d.color,transparent:true,opacity:.55}));
+  eg.position.y=h/2; g.add(eg);
+  const crown=new THREE.Mesh(new THREE.BoxGeometry(w*0.55,1.6,dp*0.55),
+    new THREE.MeshBasicMaterial({color:d.color}));
+  crown.position.y=h+0.8; g.add(crown);
+  const bea=new THREE.Mesh(new THREE.SphereGeometry(isHQ?1.6:1.05,14,14),
+    new THREE.MeshBasicMaterial({color:d.fault?0xff5f56:d.color}));
+  bea.position.y=h+3.2; g.add(bea);
+  const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:haloTex(),
+    color:d.fault?0xff5f56:d.color,transparent:true,opacity:.55,depthWrite:false}));
+  halo.scale.set(14,14,1);halo.position.y=h+3.2;g.add(halo);
+  const pod=new THREE.Mesh(new THREE.BoxGeometry(w+7,1.1,dp+7),
+    new THREE.MeshStandardMaterial({color:0x0d0d11,roughness:.9,metalness:.2}));
+  pod.position.y=.55;g.add(pod);
+  const podEdge=new THREE.LineSegments(new THREE.EdgesGeometry(pod.geometry),
+    new THREE.LineBasicMaterial({color:d.color,transparent:true,opacity:.3}));
+  podEdge.position.y=.55;g.add(podEdge);
+  if(!isHQ){
+    for(let k=0;k<2;k++){
+      const ah=5+Math.random()*7;
+      const an=new THREE.Mesh(new THREE.BoxGeometry(4.2,ah,4.2),
+        new THREE.MeshStandardMaterial({color:0x0a0a0e,roughness:.8,metalness:.3,
+          emissive:new THREE.Color(d.color),emissiveIntensity:.16}));
+      an.position.set(k?6.6:-6.6,ah/2,k?-5.6:5.6);g.add(an);
+      const ae=new THREE.LineSegments(new THREE.EdgesGeometry(an.geometry),
+        new THREE.LineBasicMaterial({color:d.color,transparent:true,opacity:.22}));
+      ae.position.copy(an.position);g.add(ae);
+    }
+  }
+  scene.add(g);
+  body.userData.d=d; pickable.push(body);
+  towers.push({d,g,body,eg,bea,halo,h,top:new THREE.Vector3(px,h+3.2,pz),base:{x:px,z:pz},pulse:0});
+});
+const byId=Object.fromEntries(towers.map(t=>[t.d.id,t]));
+
+/* ============ WIRES ============ */
+const wireGroup=new THREE.Group();scene.add(wireGroup);
+const wires=[];
+LINKS.forEach(([a,b])=>{
+  const A=byId[a].top,B=byId[b].top;
+  const mid=new THREE.Vector3().addVectors(A,B).multiplyScalar(.5);
+  mid.y=Math.max(A.y,B.y)+14+A.distanceTo(B)*0.10;
+  const curve=new THREE.QuadraticBezierCurve3(A.clone(),mid,B.clone());
+  const pts=curve.getPoints(44);
+  const fault=byId[a].d.fault||byId[b].d.fault;
+  const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),
+    new THREE.LineBasicMaterial({color:fault?0xff5f56:0xffffff,transparent:true,opacity:fault?.2:.12}));
+  wireGroup.add(line);
+  wires.push({a,b,curve,line,fault});
+});
+
+/* ============ PACKETS ============ */
+const pGeo=new THREE.SphereGeometry(.62,10,10);
+const packets=[];
+function fire(){
+  const w=wires[Math.floor(Math.random()*wires.length)];
+  const bad=w.fault&&Math.random()<.45;
+  const flip=Math.random()<.5;
+  const from=flip?w.a:w.b, to=flip?w.b:w.a;
+  const col=bad?0xff5f56:0xe8791a;
+  const m=new THREE.Mesh(pGeo,new THREE.MeshBasicMaterial({color:col}));scene.add(m);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:haloTex(),color:col,transparent:true,opacity:.6,depthWrite:false}));
+  s.scale.set(5,5,1);scene.add(s);
+  packets.push({w,m,s,t:0,sp:.0055+Math.random()*.005,flip,kind:bad?'err':'req',from,to});
+  byId[from].pulse=1; logLine(from,to,bad);
+}
+function respond(p){
+  const col=0x3ddc84;
+  const m=new THREE.Mesh(pGeo,new THREE.MeshBasicMaterial({color:col}));scene.add(m);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:haloTex(),color:col,transparent:true,opacity:.6,depthWrite:false}));
+  s.scale.set(5,5,1);scene.add(s);
+  packets.push({w:p.w,m,s,t:0,sp:p.sp*1.15,flip:!p.flip,kind:'res',from:p.to,to:p.from});
+}
+function killPacket(p){scene.remove(p.m);scene.remove(p.s);p.m.material.dispose();p.s.material.dispose()}
+function logLine(a,b,bad){
+  const ul=document.getElementById('logList');
+  const li=document.createElement('li');
+  if(bad)li.className='err';
+  const r=ROUTES[Math.floor(Math.random()*ROUTES.length)];
+  li.innerHTML=`<span class="t">${new Date().toTimeString().slice(0,8)}</span>
+    <span class="r"><i>${a}</i> → <i>${b}</i> ${r}</span>`;
+  ul.prepend(li);
+  while(ul.children.length>6)ul.lastChild.remove();
+}
+
+/* ============ CAMERA / ORBIT ============ */
+const cam={az:0.75,el:0.44,dist:150,tAz:0.75,tEl:0.44,tDist:150};
+let spin=true,dragging=false,lx=0,ly=0;
+function applyCam(){
+  cam.az+=(cam.tAz-cam.az)*.08;cam.el+=(cam.tEl-cam.el)*.08;cam.dist+=(cam.tDist-cam.dist)*.08;
+  const d=cam.dist,e=cam.el;
+  camera.position.set(Math.cos(cam.az)*Math.cos(e)*d,Math.sin(e)*d,Math.sin(cam.az)*Math.cos(e)*d);
+  camera.lookAt(0,16,0);
+}
+const el=renderer.domElement;
+el.addEventListener('pointerdown',e=>{dragging=true;lx=e.clientX;ly=e.clientY;el.setPointerCapture(e.pointerId)});
+el.addEventListener('pointerup',()=>{dragging=false});
+el.addEventListener('pointermove',e=>{
+  if(!dragging)return;
+  cam.tAz-=(e.clientX-lx)*.006;
+  cam.tEl=Math.max(.08,Math.min(1.15,cam.tEl+(e.clientY-ly)*.004));
+  lx=e.clientX;ly=e.clientY;
+});
+el.addEventListener('wheel',e=>{e.preventDefault();cam.tDist=Math.max(58,Math.min(240,cam.tDist+e.deltaY*.13));},{passive:false});
+
+/* ============ PICKING ============ */
+const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();
+let selected=null,downAt=null;
+el.addEventListener('pointerdown',e=>{downAt={x:e.clientX,y:e.clientY}});
+el.addEventListener('click',e=>{
+  if(downAt&&Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)>5)return;
+  ptr.x=(e.clientX/innerWidth)*2-1;ptr.y=-(e.clientY/innerHeight)*2+1;
+  ray.setFromCamera(ptr,camera);
+  const hit=ray.intersectObjects(pickable)[0];
+  select(hit?hit.object.userData.d.id:null);
+});
+function select(id){selected=id&&id!==selected?id:null;paintPanel();paintIndex();}
+document.getElementById('panelX').onclick=()=>select(null);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')select(null)});
+
+function paintPanel(){
+  const p=document.getElementById('panel'),intro=document.getElementById('intro');
+  if(!selected){p.classList.remove('on');intro.style.display='';return}
+  intro.style.display='none';p.classList.add('on');
+  const d=D.find(x=>x.id===selected);
+  const hex='#'+d.color.toString(16).padStart(6,'0');
+  document.getElementById('pAv').src='assets/avatars/'+d.av+'.png';
+  document.getElementById('pEyebrow').innerHTML=
+    `<i style="width:7px;height:7px;border-radius:2px;background:${hex};display:inline-block"></i>
+     <span style="color:${hex}">${d.id}</span>
+     <span style="color:var(--dim)">· ${d.fault?'Degraded':'Nominal'}</span>`;
+  document.getElementById('pName').textContent=d.name;
+  document.getElementById('pEnv').textContent='Environment · '+d.env;
+  document.getElementById('pRole').textContent=d.role;
+  document.getElementById('pCrew').innerHTML=d.crew.map(c=>`<span>${c}</span>`).join('');
+  document.getElementById('pSteps').innerHTML=d.steps.map((s,i)=>{
+    const cls=i<d.now?'done':i===d.now?'now':'';
+    return `<li class="${cls}">${s}${i===d.now?' <span style="color:var(--amber2)">— in progress</span>':''}</li>`;
+  }).join('');
+  const routes=LINKS.filter(l=>l[0]===d.id||l[1]===d.id).length;
+  document.getElementById('pVitals').innerHTML=`
+    <div class="kv"><span>Sub-agents on shift</span><span>${d.agents}</span></div>
+    <div class="kv"><span>Routes</span><span>${routes}</span></div>
+    <div class="kv"><span>Runs today</span><span>${d.runs.toLocaleString()}</span></div>
+    <div class="kv"><span>Uptime 30d</span><span>${d.uptime.toFixed(2)}%</span></div>`;
+}
+function paintIndex(){
+  document.getElementById('idx').innerHTML=D.map(d=>{
+    const hex='#'+d.color.toString(16).padStart(6,'0');
+    const short=d.name.split(' · ')[0];
+    return `<li><button data-id="${d.id}" class="${selected===d.id?'on':''}">
+      <i style="background:${hex}"></i>${short}<span class="h">${d.agents}</span></button></li>`;
+  }).join('');
+}
+document.getElementById('idx').addEventListener('click',e=>{
+  const b=e.target.closest('button');
+  if(b){select(b.dataset.id);focusOn(b.dataset.id)}
+});
+function focusOn(id){
+  const t=byId[id];if(!t)return;
+  cam.tAz=Math.atan2(t.base.z,t.base.x)-0.55;
+  cam.tDist=id==='HQ'?120:96;cam.tEl=0.36;
+  spin=false;document.getElementById('bSpin').classList.remove('on');
+}
+
+/* ============ CONTROLS ============ */
+document.getElementById('bSpin').onclick=e=>{spin=!spin;e.target.classList.toggle('on',spin)};
+document.getElementById('bWires').onclick=e=>{wireGroup.visible=!wireGroup.visible;e.target.classList.toggle('on',wireGroup.visible);};
+document.getElementById('bReset').onclick=()=>{cam.tAz=0.75;cam.tEl=0.44;cam.tDist=150;select(null);};
+
+/* ============ LOOP ============ */
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let last=0;
+function loop(ts){
+  const dt=Math.min(3,(ts-last)/16.7);last=ts;
+  if(spin&&!dragging&&!reduce) cam.tAz+=0.0011*dt;
+  applyCam();
+  towers.forEach(t=>{
+    t.pulse=Math.max(0,t.pulse-.022*dt);
+    t.bea.scale.setScalar(1+t.pulse*.55);
+    t.halo.material.opacity=.32+t.pulse*.5;
+    const dim=selected&&selected!==t.d.id
+      && !LINKS.some(l=>(l[0]===selected&&l[1]===t.d.id)||(l[1]===selected&&l[0]===t.d.id));
+    t.body.material.emissiveIntensity=dim?.22:.85;
+    t.eg.material.opacity=dim?.16:.55;
+  });
+  wires.forEach(w=>{
+    const on=!selected||w.a===selected||w.b===selected;
+    w.line.material.opacity=on?(w.fault?.22:.13):.035;
+  });
+  for(let i=packets.length-1;i>=0;i--){
+    const p=packets[i];p.t+=p.sp*dt;
+    if(p.t>=1){
+      byId[p.to].pulse=1;
+      if(p.kind==='req'&&Math.random()<.7) respond(p);
+      killPacket(p);packets.splice(i,1);continue;
+    }
+    const u=p.flip?p.t:1-p.t;
+    const v=p.w.curve.getPoint(u);
+    p.m.position.copy(v);p.s.position.copy(v);
+  }
+  document.getElementById('mF').textContent=packets.length;
+  renderer.render(scene,camera);
+  requestAnimationFrame(loop);
+}
+addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+/* ============ BOOT ============ */
+document.getElementById('mD').textContent=D.length;
+document.getElementById('mA').textContent=D.reduce((s,d)=>s+d.agents,0);
+document.getElementById('mR').textContent=LINKS.length;
+paintIndex();
+setInterval(()=>{if(packets.length<70)fire()},330);
+requestAnimationFrame(loop);
+setTimeout(()=>document.getElementById('loading').classList.add('gone'),700);
+</script>
+</body>
+</html>
