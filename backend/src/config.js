@@ -23,6 +23,8 @@ var config = {
   cookieSecret: env("COOKIE_SECRET", ""),
   cookieSecure: env("COOKIE_SECURE", "false") === "true",
   allowedOrigin: env("ALLOWED_ORIGIN", ""),
+  // Behind a reverse proxy / load balancer (honor X-Forwarded-For for client IP).
+  trustProxy: env("TRUST_PROXY", "false") === "true",
 
   // Email-verification tokens.
   tokenSecret: env("TOKEN_SECRET", env("COOKIE_SECRET", "")),
