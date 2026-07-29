@@ -84,7 +84,9 @@ var remote = {
 };
 
 function backend() {
-  return config.accountsStore === "remote" ? remote : memory;
+  if (config.accountsStore === "remote") return remote;
+  if (config.accountsStore === "sqlite") return require("./sqlite").projects;
+  return memory;
 }
 
 module.exports = {

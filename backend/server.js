@@ -62,8 +62,14 @@ if (config.allowedOrigin) {
 
 // Health check
 app.get("/healthz", function (req, res) {
+  var store = { kind: config.accountsStore, ok: true };
+  if (config.accountsStore === "sqlite") {
+    try { require("./src/sqlite")._db().prepare("SELECT 1 AS ok").get(); }
+    catch (e) { store.ok = false; store.error = "sqlite unavailable"; }
+  }
   res.json({
-    ok: true,
+    ok: store.ok,
+    store: store,
     providers: {
       microsoft: cfg.isProviderConfigured("microsoft"),
       google: cfg.isProviderConfigured("google")
