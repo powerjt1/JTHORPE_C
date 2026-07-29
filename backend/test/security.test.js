@@ -48,7 +48,7 @@ function ok(name, cond) { console.log((cond ? "PASS" : "FAIL") + " " + name); if
   var sec2 = require("../src/security");
   var a = sec2.auditProduction();
   ok("prod audit flags weak secret as fatal", a.fatals.some(function (f) { return /COOKIE_SECRET/.test(f); }));
-  ok("prod audit flags insecure cookies as fatal", a.fatals.some(function (f) { return /COOKIE_SECURE/.test(f); }));
+  ok("prod audit warns on insecure cookies", a.warnings.some(function (f) { return /COOKIE_SECURE/.test(f); }));
   process.env.NODE_ENV = savedEnv; process.env.COOKIE_SECRET = savedSecret;
 
   server.close();

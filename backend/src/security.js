@@ -100,10 +100,13 @@ function auditProduction() {
   var fatals = [];
 
   if (!config.cookieSecret || config.cookieSecret.length < 32) {
+    // A weak signing secret is unambiguously unsafe — hard fail in production.
     (isProd ? fatals : warnings).push("COOKIE_SECRET should be a long random value (>= 32 chars).");
   }
   if (isProd && !config.cookieSecure) {
-    fatals.push("COOKIE_SECURE must be true in production (HTTPS).");
+    // Whether cookies must be Secure depends on TLS topology (e.g. a proxy that
+    // terminates TLS). Warn loudly rather than block a valid proxy/local setup.
+    warnings.push("COOKIE_SECURE is false in production — set it true when serving over HTTPS.");
   }
   if (isProd && !config.allowedOrigin && process.env.SERVE_STATIC !== "true") {
     warnings.push("ALLOWED_ORIGIN is empty; cross-origin browser calls will be blocked.");
