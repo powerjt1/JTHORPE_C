@@ -1,0 +1,11 @@
+{
+  "id": "plg-hello-report",
+  "name": "Hello Report",
+  "version": "1.0.0",
+  "kind": "tool",
+  "capabilities": ["report.generate", "report.export.pdf"],
+  "agents": ["MB-005"],
+  "connections": [],
+  "status": "registered",
+  "description": "Example plugin manifest: grants Bianca (MB-005) a simple report generation/export tool. Declarative only — no executable code in v0.1."
+}

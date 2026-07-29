@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Assembly — JABBNETWORKS AIOS</title>
+  <meta name="description" content="JABBNETWORKS AIOS Agent Assembly — the full 10-agent team checking in one by one with live operational-readiness status. Powered by JABB Networks." />
+  <meta name="theme-color" content="#0b1020" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/assembly.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Lucy AI home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32" role="img" aria-hidden="true">
+            <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+            <rect x="2" y="2" width="28" height="28" rx="9" fill="url(#lg)"/>
+            <path d="M11 9v11h8" fill="none" stroke="#0b1020" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="21" cy="11" r="2.2" fill="#0b1020"/>
+          </svg>
+        </span>
+        <span class="brand-name">Lucy<span class="brand-accent">AI</span></span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+        <ul class="nav-menu" id="nav-menu">
+          <li><a href="team.html">Team</a></li>
+          <li><a href="aios.html">AIOS</a></li>
+          <li><a href="workspace.html">Workspace</a></li>
+          <li><a href="assembly.html" aria-current="page">Assembly</a></li>
+          <li><a href="city.html">City</a></li>
+          <li><a href="command-center.html">Command Center</a></li>
+          <li><a href="signup.html" class="btn btn-nav">Start free trial</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="assembly">
+    <div class="container">
+      <header class="assembly-head">
+        <p class="eyebrow">JABBNETWORKS AIOS <span class="demo-badge" id="assemblyMode">Status check</span></p>
+        <h1>🏗 Agent Assembly</h1>
+        <p>Team status check — operational readiness. The full team checks in one by one.</p>
+        <div class="assembly-line"></div>
+      </header>
+
+      <div class="assembly-grid" id="assemblyGrid"></div>
+
+      <div class="assembly-summary" id="assemblySummary">
+        <div><h4 id="aActive">0</h4><p>Active</p></div>
+        <div><h4 id="aReady">0</h4><p>Ready to work</p></div>
+        <div><h4 id="aTotal">0</h4><p>Team members</p></div>
+      </div>
+
+      <div class="assembly-controls" id="assemblyControls">
+        <button class="btn" id="aReset" type="button">Reset Assembly</button>
+        <button class="btn btn-ghost" id="aPause" type="button">Pause</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <p>&copy; <span id="year">2026</span> Lucy AI. All rights reserved.</p>
+      <p class="powered">
+        <img class="jabb-mark" src="assets/brand/jabbnetworks-logo.png" alt="JABB Networks" />
+        Powered by <a href="https://jabbnetworks.com" target="_blank" rel="noopener noreferrer">JABB&nbsp;Networks</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="aios-config.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/voice.js" defer></script>
+  <script src="js/assembly.js" defer></script>
+</body>
+</html>

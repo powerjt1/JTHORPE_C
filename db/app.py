@@ -80,7 +80,8 @@ def init_db():
                 phase_name  TEXT,
                 order_index INTEGER NOT NULL,
                 status      TEXT NOT NULL,
-                message     TEXT
+                message     TEXT,
+                updated_at  TEXT
             )
             """
         )
@@ -165,6 +166,7 @@ def task_row_to_dict(row):
         "orderIndex": row["order_index"],
         "status": row["status"],
         "message": row["message"],
+        "updatedAt": row["updated_at"],
     }
 
 
@@ -208,10 +210,11 @@ def create_task(t):
         _conn.commit()
 
 
-def update_task(tid, status, message):
+def update_task(tid, status, message, updated_at=None):
     with _lock:
         cur = _conn.execute(
-            "UPDATE tasks SET status = ?, message = ? WHERE id = ?", (status, message, tid)
+            "UPDATE tasks SET status = ?, message = ?, updated_at = ? WHERE id = ?",
+            (status, message, updated_at or now_iso(), tid),
         )
         _conn.commit()
         return cur.rowcount
@@ -326,7 +329,7 @@ class Handler(BaseHTTPRequestHandler):
             tid = data.get("id")
             if not tid:
                 return self._send(400, {"error": "id required"})
-            return self._send(200, {"updated": update_task(tid, data.get("status"), data.get("message", ""))})
+            return self._send(200, {"updated": update_task(tid, data.get("status"), data.get("message", ""), data.get("updatedAt"))})
         return self._send(404, {"error": "not found"})
 
     def log_message(self, fmt, *args):  # quieter logs

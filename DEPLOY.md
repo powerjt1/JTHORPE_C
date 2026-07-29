@@ -67,9 +67,25 @@ These need your own credentials (see [`docs/auth-setup.md`](docs/auth-setup.md))
 - Back up the `dbdata` volume. To move to Postgres/MySQL later, swap the storage
   layer inside `db/app.py` — the app's API contract stays the same.
 
+## Data store options
+
+Set `ACCOUNTS_STORE`:
+
+- **`sqlite`** (recommended for single-node) — native `node:sqlite`, persistent,
+  **no extra service**. Needs **Node ≥ 22.5**. Set `SQLITE_PATH=/data/aios.db` and
+  mount a volume at `/data`. Survives restarts; `/healthz` reports
+  `store.kind=sqlite`. (On older Node, use `memory` or `remote`.)
+- **`remote`** — the separate Python SQLite bridge (`db/`) over the Compose
+  network, guarded by `DB_TOKEN` (what `docker-compose.yml` wires today).
+- **`memory`** — dev only; resets on restart.
+
+Back up the store's volume. To move to Postgres/MySQL later, add a store backend
+(mirror `src/sqlite.js`) — the app's async store interface stays the same.
+
 ## Running without Docker
 
-- **DB bridge:** `cd db && DB_TOKEN=… python3 app.py`
-- **Backend + site:** `cd backend && cp .env.example .env && npm install && SERVE_STATIC=true ACCOUNTS_STORE=remote DB_BRIDGE_URL=http://localhost:8799 npm start`
+- **Simplest (sqlite):** `cd backend && cp .env.example .env && npm install && SERVE_STATIC=true ACCOUNTS_STORE=sqlite SQLITE_PATH=./data/aios.db npm start`
+- **DB bridge (remote):** `cd db && DB_TOKEN=… python3 app.py`, then
+  `cd backend && SERVE_STATIC=true ACCOUNTS_STORE=remote DB_BRIDGE_URL=http://localhost:8799 npm start`
 
 See [`backend/README.md`](backend/README.md) and [`db/README.md`](db/README.md).

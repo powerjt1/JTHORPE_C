@@ -13,7 +13,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"   # >= 22.5 for the built-in node:sqlite store
 
       - name: Install backend dependencies
         working-directory: backend
@@ -38,3 +38,18 @@ jobs:
           DB_BRIDGE_URL: http://localhost:8799
           DB_TOKEN: citoken
         run: npm run test:remote
+
+  kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate the prompt library (every agent well-formed)
+        working-directory: kernel
+        run: python -m motherbridge validate
+
+      - name: MotherBridge kernel tests (stdlib only)
+        working-directory: kernel
+        run: python -m unittest discover -s tests -v

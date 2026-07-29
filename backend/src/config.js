@@ -23,6 +23,8 @@ var config = {
   cookieSecret: env("COOKIE_SECRET", ""),
   cookieSecure: env("COOKIE_SECURE", "false") === "true",
   allowedOrigin: env("ALLOWED_ORIGIN", ""),
+  // Behind a reverse proxy / load balancer (honor X-Forwarded-For for client IP).
+  trustProxy: env("TRUST_PROXY", "false") === "true",
 
   // Email-verification tokens.
   tokenSecret: env("TOKEN_SECRET", env("COOKIE_SECRET", "")),
@@ -30,8 +32,10 @@ var config = {
   // Where /auth/verify sends users after success (defaults to WELCOME_URL).
   verifiedUrl: env("VERIFIED_URL", ""),
 
-  // Account store: "memory" (default) or "remote" (Python SQLite bridge in db/).
+  // Data store: "memory" (default, dev), "sqlite" (native node:sqlite, persistent,
+  // single-process), or "remote" (Python SQLite bridge in db/).
   accountsStore: env("ACCOUNTS_STORE", "memory"),
+  sqlitePath: env("SQLITE_PATH", "./data/aios.db"),
   dbBridgeUrl: env("DB_BRIDGE_URL", "http://localhost:8799"),
   dbToken: env("DB_TOKEN", ""),
 

@@ -17,65 +17,89 @@
 
   var AGENTS = {
     lucy: {
-      name: "Lucy", role: "AI Orchestrator", face: "🎯", accent: "#7c5cff",
-      personality: "Calm, confident, professional. Lucy runs the room — she reads your intent, plans the work, and delegates to the right specialist.",
+      name: "Lucy", role: "Chief AI Orchestrator", face: "🧠", accent: "#7c5cff",
+      img: "assets/avatars/lucy.png",
+      personality: "Calm, confident, executive. Lucy runs the room — she reads your intent, plans the work, and delegates to the right specialist.",
       caps: ["Turns a request into a project plan", "Assigns tasks to the right specialist", "Tracks status and keeps a human in the loop", "Synthesizes everyone's work into one answer"],
       anim: "Gestures while assigning tasks and looks toward each specialist as she delegates."
     },
     julian: {
-      name: "Julian", role: "Enterprise Architect", face: "🏛️", accent: "#3b82f6",
+      name: "Julian", role: "Enterprise Solution Architect", face: "🏗️", accent: "#3b82f6",
+      img: "assets/avatars/julian.png",
       personality: "Big-picture and precise. Julian designs solutions that scale and hold up under real load.",
       caps: ["Designs enterprise solution architecture", "Chooses the right Power Platform + Azure services", "Plans ALM, environments, and integration patterns", "Reviews for cost and scale"],
       anim: "Draws solution diagrams in the air and rotates 3D system models."
     },
     jabb: {
-      name: "JABBNETWORKS", role: "Platform Operations", face: "🛰️", accent: "#6366f1",
+      name: "JABBNETWORKS", role: "Platform Operations Architect", face: "⚙️", accent: "#6366f1",
+      img: "assets/avatars/jabb.png",
       personality: "The steady hand on the platform. Provisions, connects, and keeps everything running.",
-      caps: ["Provisions environments and tenants", "Links APIs and connections (via the secure gateway)", "Monitors servers and health", "Deploys solutions"],
+      caps: ["Provisions environments, Dataverse & SharePoint", "Links APIs, Python, FTP/SFTP (via the kernel)", "Monitors servers and health", "Deploys solutions"],
       anim: "Configures environments, links APIs, monitors servers, and deploys solutions."
     },
+    ryan: {
+      name: "Ryan", role: "Data & Fabric Architect", face: "🌐", accent: "#0ea5e9",
+      img: "assets/avatars/ryan.png",
+      personality: "Rigorous data engineer. Cares about lineage, quality, and a single source of truth.",
+      caps: ["Builds Microsoft Fabric lakehouse & warehouses", "Designs pipelines and semantic models", "Enforces data quality and lineage", "Publishes certified datasets"],
+      anim: "Assembles OneLake pipelines and lights up a medallion data flow."
+    },
     alex: {
-      name: "Alex", role: "Automation & RPA", face: "🤖", accent: "#f59e0b",
+      name: "Alex", role: "Automation Architect", face: "🤖", accent: "#f59e0b",
+      img: "assets/avatars/alex.png",
       personality: "Relentless about removing busywork. If it repeats, Alex automates it.",
-      caps: ["Designs cloud and desktop flows (RPA)", "Wires up data and notifications", "Handles retries and error paths", "Watches automations execute"],
+      caps: ["Designs cloud and desktop flows (RPA)", "Builds Azure Functions & Logic Apps", "Handles retries and error paths", "Watches automations execute"],
       anim: "Connects flow blocks and watches cloud and desktop flow paths light up."
     },
     brianna: {
-      name: "Brianna", role: "Power Apps Developer", face: "📱", accent: "#ec4899",
+      name: "Brianna", role: "Power Apps Architect", face: "📱", accent: "#ec4899",
+      img: "assets/avatars/brianna.png",
       personality: "Design-minded builder. Turns requirements into apps people actually enjoy using.",
-      caps: ["Builds canvas and model-driven apps", "Designs forms and responsive layouts", "Connects apps to data and flows", "Previews across devices"],
+      caps: ["Builds canvas and model-driven apps", "Designs forms and responsive layouts", "Connects apps to Dataverse and flows", "Previews across devices"],
       anim: "Builds forms, drags controls onto a canvas, and previews responsive layouts."
     },
     bianca: {
-      name: "Bianca", role: "Power Pages & Power BI", face: "📊", accent: "#14b8a6",
+      name: "Bianca", role: "Portal & Analytics Architect", face: "📊", accent: "#14b8a6",
+      img: "assets/avatars/bianca.png",
       personality: "Storyteller with data. Makes information clear, live, and beautiful.",
-      caps: ["Builds Power BI dashboards", "Creates Power Pages portals", "Models and refreshes data", "Publishes live reports"],
+      caps: ["Builds Power BI dashboards", "Creates Power Pages portals", "Models RLS and refreshes data", "Publishes live reports"],
       anim: "Charts animate into view, dashboards update live, and portals render on floating screens."
     },
-    phoenix: {
-      name: "Phoenix", role: "QA & DevOps", face: "🚀", accent: "#f97316",
-      personality: "Calm under pressure. Ships confidently because everything is tested.",
-      caps: ["Runs automated tests", "Manages release pipelines", "Gates deployments on quality", "Rolls back safely when needed"],
+    christina: {
+      name: "Christina", role: "QA & DevOps Director", face: "🚀", accent: "#f97316",
+      img: "assets/avatars/christina.png",
+      personality: "Calm under pressure. Ships confidently because everything is tested and reversible.",
+      caps: ["Runs automated tests (unit → E2E)", "Manages CI/CD release pipelines", "Gates deployments on quality", "Rolls back safely when needed"],
       anim: "Runs automated tests, shows green checkmarks, and manages release pipelines."
     },
-    sentinel: {
-      name: "Sentinel", role: "Security & Governance", face: "🛡️", accent: "#10b981",
+    kaira: {
+      name: "Kaira", role: "Security & Governance Director", face: "🛡️", accent: "#10b981",
+      img: "assets/avatars/kaira.png",
       personality: "Watchful and exacting. Protects data and enforces the rules, quietly and constantly.",
-      caps: ["Scans for threats and misconfig", "Enforces DLP and access policy", "Validates compliance", "Locks down sensitive resources"],
+      caps: ["Manages Entra ID, RBAC & Key Vault", "Enforces DLP and access policy", "Validates compliance and audit", "Locks down sensitive resources"],
       anim: "Scans systems, highlights threats, locks resources, and validates compliance."
+    },
+    miakkcar: {
+      name: "MiaKkcar", role: "Product & Customer Experience Director", face: "💼", accent: "#a855f7",
+      img: "assets/avatars/miakkcar.png",
+      personality: "Customer-obsessed and outcome-driven. Keeps the team building what matters.",
+      caps: ["Owns product strategy and roadmap", "Leads UI/UX, branding & onboarding", "Defines success metrics/KPIs", "Prepares the marketplace launch"],
+      anim: "Maps the customer journey and lights up KPIs on an executive dashboard."
     }
   };
 
   // Ordered orchestration script (agent + what they say + phase index).
   var SCRIPT = [
-    { id: "lucy",     say: "On it. Spinning up the project and briefing the team.", phase: 0 },
-    { id: "julian",   say: "Designing the architecture and target environments.",   phase: 1 },
-    { id: "jabb",     say: "Provisioning environments and linking connections.",     phase: 2 },
-    { id: "alex",     say: "Building the automations and flows.",                    phase: 3 },
-    { id: "brianna",  say: "Building the app and its screens.",                      phase: 4 },
-    { id: "bianca",   say: "Creating dashboards and the client portal.",            phase: 5 },
-    { id: "phoenix",  say: "Running tests and preparing the release.",              phase: 6 },
-    { id: "sentinel", say: "Scanning for threats and validating compliance.",        phase: 7 }
+    { id: "lucy",      say: "On it. Spinning up the project and briefing the team.", phase: 0 },
+    { id: "julian",    say: "Designing the architecture and target environments.",   phase: 1 },
+    { id: "jabb",      say: "Provisioning environments and linking connections.",     phase: 2 },
+    { id: "ryan",      say: "Building the data foundation — lakehouse and models.",   phase: 3 },
+    { id: "alex",      say: "Building the automations and flows.",                    phase: 4 },
+    { id: "brianna",   say: "Building the app and its screens.",                      phase: 5 },
+    { id: "bianca",    say: "Creating dashboards and the client portal.",            phase: 6 },
+    { id: "christina", say: "Running tests and preparing the release.",              phase: 7 },
+    { id: "kaira",     say: "Scanning for threats and validating compliance.",        phase: 8 },
+    { id: "miakkcar",  say: "Polishing the experience and prepping launch.",          phase: 9 }
   ];
 
   var cards = {};
@@ -272,6 +296,7 @@
   // ---- Workspace modal ----
   var modal = document.getElementById("agentModal");
   var mFace = document.getElementById("modalFace");
+  var mImg = document.getElementById("modalImg");
   var mName = document.getElementById("modalName");
   var mRole = document.getElementById("modalRole");
   var mPers = document.getElementById("modalPersonality");
@@ -285,6 +310,17 @@
     lastFocused = document.activeElement;
     modal.style.setProperty("--accent", a.accent);
     mFace.textContent = a.face;
+    // Portrait over the emoji fallback.
+    if (mImg) {
+      if (a.img) {
+        mImg.style.display = "";
+        mImg.onerror = function () { mImg.style.display = "none"; };
+        mImg.src = a.img;
+      } else {
+        mImg.style.display = "none";
+        mImg.removeAttribute("src");
+      }
+    }
     mName.textContent = a.name;
     mRole.textContent = a.role;
     mPers.textContent = a.personality;

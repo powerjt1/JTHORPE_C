@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JABB Agent Assembly — Status Check</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d0f2d 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #00d9ff 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 0.95rem;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .status-line {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, #00d9ff, #7c3aed);
+            margin: 20px auto;
+        }
+
+        .assembly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .agent-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .agent-card.checking-in {
+            animation: slideInUp 0.5s ease-out forwards;
+        }
+
+        .agent-card:hover {
+            background: rgba(0, 217, 255, 0.08);
+            border-color: rgba(0, 217, 255, 0.3);
+            transform: translateY(-8px);
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00d9ff, transparent);
+            opacity: 0;
+            animation: shine 2s infinite;
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .agent-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d9ff, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+            position: relative;
+        }
+
+        .agent-avatar.offline {
+            background: linear-gradient(135deg, #555, #333);
+            box-shadow: 0 0 10px rgba(100, 100, 100, 0.3);
+        }
+
+        .agent-avatar.busy {
+            background: linear-gradient(135deg, #ff6b6b, #ff8787);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+            animation: pulse-orange 1.5s ease-in-out infinite;
+        }
+
+        .agent-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .agent-info p {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .agent-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(0, 217, 255, 0.08);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00d9ff;
+            box-shadow: 0 0 8px #00d9ff;
+            animation: pulse-blue 1.5s ease-in-out infinite;
+        }
+
+        .status-indicator.idle {
+            background: #888;
+            box-shadow: 0 0 4px #888;
+            animation: none;
+        }
+
+        .status-indicator.busy {
+            background: #ff6b6b;
+            box-shadow: 0 0 8px #ff6b6b;
+            animation: pulse-orange 1.5s ease-in-out infinite;
+        }
+
+        .status-indicator.offline {
+            background: #555;
+            box-shadow: none;
+            animation: none;
+        }
+
+        .status-text {
+            font-weight: 500;
+            color: #00d9ff;
+        }
+
+        .status-text.idle {
+            color: #888;
+        }
+
+        .status-text.busy {
+            color: #ff6b6b;
+        }
+
+        .status-text.offline {
+            color: #555;
+        }
+
+        .timestamp {
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 12px;
+            text-align: right;
+        }
+
+        .summary {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 217, 255, 0.08);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            animation: fadeInUp 1s ease-out 4s forwards;
+            opacity: 0;
+            text-align: center;
+        }
+
+        .summary-item h4 {
+            font-size: 2rem;
+            color: #00d9ff;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .summary-item p {
+            font-size: 0.85rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-panel {
+            margin-top: 40px;
+            text-align: center;
+            animation: fadeInUp 1s ease-out 5s forwards;
+            opacity: 0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00d9ff, #7c3aed);
+            border: none;
+            color: #0a0e27;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.4);
+        }
+
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse-blue {
+            0%, 100% {
+                box-shadow: 0 0 8px #00d9ff;
+            }
+            50% {
+                box-shadow: 0 0 16px #00d9ff;
+            }
+        }
+
+        @keyframes pulse-orange {
+            0%, 100% {
+                box-shadow: 0 0 8px #ff6b6b;
+            }
+            50% {
+                box-shadow: 0 0 16px #ff6b6b;
+            }
+        }
+
+        @keyframes shine {
+            0%, 100% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .checkin-indicator {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            background: rgba(0, 217, 255, 0.2);
+            border: 1px solid rgba(0, 217, 255, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: #00d9ff;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏗 JABB ASSEMBLY</h1>
+            <p>Team Status Check — Operational Readiness</p>
+            <div class="status-line"></div>
+        </div>
+
+        <div class="assembly-grid" id="assemblyGrid"></div>
+
+        <div class="summary" id="summary">
+            <div class="summary-item">
+                <h4 id="activeCount">0</h4>
+                <p>Active</p>
+            </div>
+            <div class="summary-item">
+                <h4 id="readyCount">0</h4>
+                <p>Ready to work</p>
+            </div>
+            <div class="summary-item">
+                <h4 id="totalCount">0</h4>
+                <p>Team Members</p>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <button class="btn" onclick="resetAssembly()">Reset Assembly</button>
+            <button class="btn secondary" onclick="toggleAutoAssembly()">Pause</button>
+        </div>
+    </div>
+
+    <script>
+        // Full 10-agent MotherBridge roster (reconciled from Mother:
+        // Phoenix→Christina, Sentinel→Kaira; adds Ryan + MiaKkcar).
+        const agents = [
+            { id: 'lucy', name: 'Lucy', role: 'Chief AI Orchestrator', status: 'active', emoji: '🧠' },
+            { id: 'julian', name: 'Julian', role: 'Enterprise Solution Architect', status: 'active', emoji: '🏗️' },
+            { id: 'alex', name: 'Alex', role: 'Automation Architect', status: 'idle', emoji: '⚙️' },
+            { id: 'brianna', name: 'Brianna', role: 'Power Apps Architect', status: 'active', emoji: '📱' },
+            { id: 'bianca', name: 'Bianca', role: 'Portal & Analytics Architect', status: 'active', emoji: '📊' },
+            { id: 'ryan', name: 'Ryan', role: 'Data & Fabric Architect', status: 'idle', emoji: '🗄️' },
+            { id: 'jabbnetworks', name: 'JABBNETWORKS', role: 'Platform Operations Architect', status: 'active', emoji: '🌐' },
+            { id: 'christina', name: 'Christina', role: 'QA & DevOps Director', status: 'active', emoji: '🔧' },
+            { id: 'kaira', name: 'Kaira', role: 'Security & Governance Director', status: 'active', emoji: '🛡️' },
+            { id: 'miakkcar', name: 'MiaKkcar', role: 'Product & CX Director', status: 'active', emoji: '✨' },
+        ];
+
+        let autoPlay = true;
+        let currentIndex = 0;
+
+        function getStatusClass(status) {
+            return status === 'active' ? 'active' : status === 'busy' ? 'busy' : 'idle';
+        }
+
+        function getStatusLabel(status) {
+            return status === 'active' ? '● Online' : status === 'busy' ? '● Busy' : '● Idle';
+        }
+
+        function renderAgent(agent, delay) {
+            const card = document.createElement('div');
+            card.className = 'agent-card';
+            card.style.animationDelay = `${delay}s`;
+
+            const statusClass = getStatusClass(agent.status);
+            const statusLabel = getStatusLabel(agent.status);
+
+            card.innerHTML = `
+                <div>
+                    <div class="agent-header">
+                        <div class="agent-avatar ${statusClass}">
+                            ${agent.emoji}
+                        </div>
+                        <div class="agent-info">
+                            <h3>${agent.name}</h3>
+                            <p>${agent.role}</p>
+                        </div>
+                    </div>
+                    <div class="agent-status">
+                        <div class="status-indicator ${statusClass}"></div>
+                        <span class="status-text ${statusClass}">${statusLabel}</span>
+                    </div>
+                    <div class="timestamp">${new Date().toLocaleTimeString()}</div>
+                </div>
+                <div class="checkin-indicator">✓</div>
+            `;
+
+            document.getElementById('assemblyGrid').appendChild(card);
+
+            setTimeout(() => {
+                card.classList.add('checking-in');
+            }, 50);
+        }
+
+        function startAssembly() {
+            if (currentIndex >= agents.length) return;
+
+            renderAgent(agents[currentIndex], 0);
+            currentIndex++;
+
+            if (autoPlay && currentIndex < agents.length) {
+                setTimeout(startAssembly, 400);
+            }
+        }
+
+        function updateSummary() {
+            const active = agents.filter(a => a.status === 'active').length;
+            const ready = agents.filter(a => a.status === 'active' || a.status === 'idle').length;
+
+            document.getElementById('activeCount').textContent = active;
+            document.getElementById('readyCount').textContent = ready;
+            document.getElementById('totalCount').textContent = agents.length;
+        }
+
+        function resetAssembly() {
+            currentIndex = 0;
+            autoPlay = true;
+            document.getElementById('assemblyGrid').innerHTML = '';
+            document.getElementById('summary').style.opacity = '0';
+            document.querySelector('.control-panel').style.opacity = '0';
+            document.querySelector('.btn').textContent = 'Reset Assembly';
+            startAssembly();
+        }
+
+        function toggleAutoAssembly() {
+            autoPlay = !autoPlay;
+            if (autoPlay && currentIndex < agents.length) {
+                startAssembly();
+                document.querySelector('.btn.secondary').textContent = 'Pause';
+            } else {
+                document.querySelector('.btn.secondary').textContent = 'Resume';
+            }
+        }
+
+        // Start on load
+        window.addEventListener('load', () => {
+            startAssembly();
+            setTimeout(() => {
+                updateSummary();
+                document.getElementById('summary').style.opacity = '1';
+                document.querySelector('.control-panel').style.opacity = '1';
+            }, 3500);
+        });
+    </script>
+</body>
+</html>

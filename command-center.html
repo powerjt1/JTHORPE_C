@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIOS Command Center — JABBNETWORKS</title>
+  <meta name="description" content="JABBNETWORKS AIOS — the Enterprise AI Command Center. Live KPIs, the AI team, agent workload, project health, and the Microsoft ecosystem in one glass cockpit. Powered by JABB Networks." />
+  <meta name="theme-color" content="#0b1020" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/aios.css" />
+  <link rel="stylesheet" href="css/command-center.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Lucy AI home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32" role="img" aria-hidden="true">
+            <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+            <rect x="2" y="2" width="28" height="28" rx="9" fill="url(#lg)"/>
+            <path d="M11 9v11h8" fill="none" stroke="#0b1020" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="21" cy="11" r="2.2" fill="#0b1020"/>
+          </svg>
+        </span>
+        <span class="brand-name">Lucy<span class="brand-accent">AI</span></span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+        <ul class="nav-menu" id="nav-menu">
+          <li><a href="team.html">Team</a></li>
+          <li><a href="aios.html">AIOS</a></li>
+          <li><a href="workspace.html">Workspace</a></li>
+          <li><a href="assembly.html">Assembly</a></li>
+          <li><a href="city.html">City</a></li>
+          <li><a href="command-center.html" aria-current="page">Command Center</a></li>
+          <li><a href="signup.html" class="btn btn-nav">Start free trial</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="cc">
+    <div class="container">
+      <!-- Title bar -->
+      <header class="cc-titlebar">
+        <div>
+          <p class="eyebrow">JABBNETWORKS AIOS <span class="demo-badge" id="ccMode">Concept dashboard</span></p>
+          <h1>Enterprise AI Command Center</h1>
+        </div>
+        <div class="cc-live"><span class="cc-dot"></span> LIVE · <span id="ccClock">10:30 AM</span></div>
+      </header>
+
+      <!-- KPI tiles -->
+      <section class="cc-kpis" aria-label="Key metrics">
+        <div class="cc-kpi"><span class="cc-kpi-label">Active Projects</span><span class="cc-kpi-value" id="kActiveProjects">12</span><span class="cc-kpi-delta up" id="kActiveDelta">+2 today</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">AI Agents</span><span class="cc-kpi-value" id="kAgents">10/10</span><span class="cc-kpi-delta">All online</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">Automation Runs</span><span class="cc-kpi-value" id="kAutomationRuns">1,429</span><span class="cc-kpi-delta up" id="kRunsDelta">+15.3%</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">Success Rate</span><span class="cc-kpi-value" id="kSuccess">98.7%</span><span class="cc-kpi-delta up">tasks done</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">API Calls</span><span class="cc-kpi-value" id="kApiCalls">42,531</span><span class="cc-kpi-delta up">this session</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">Security Score</span><span class="cc-kpi-value" id="kSecurity">100%</span><span class="cc-kpi-delta">Excellent</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">Deployments</span><span class="cc-kpi-value" id="kDeployments">23</span><span class="cc-kpi-delta">completed</span></div>
+        <div class="cc-kpi"><span class="cc-kpi-label">AI Tokens <span class="cc-est">est.</span></span><span class="cc-kpi-value" id="kTokens">2.4M</span><span class="cc-kpi-delta up">from runs</span></div>
+      </section>
+
+      <!-- Main grid -->
+      <div class="cc-grid">
+        <!-- Left: the AI team -->
+        <section class="cc-card cc-team">
+          <header class="cc-card-head"><h2>The AI Dream Team</h2><span class="cc-sub">12 specialists</span></header>
+          <ul class="cc-team-list">
+            <li><img src="assets/avatars/lucy.png" alt=""><span><strong>Lucy</strong><em>Chief AI Orchestrator</em></span><span class="cc-online">Online</span></li>
+            <li><img src="assets/avatars/julian.png" alt=""><span><strong>Julian</strong><em>Enterprise Solution Architect</em></span><span class="cc-online">Online</span></li>
+            <li><img src="assets/avatars/jabb.png" alt=""><span><strong>JABBNETWORKS</strong><em>Platform Operations Architect</em></span><span class="cc-online">Online</span></li>
+            <li><img src="assets/avatars/ryan.png" alt=""><span><strong>Ryan</strong><em>Data &amp; Fabric Architect</em></span><span class="cc-online">Online</span></li>
+            <li><img src="assets/avatars/alex.png" alt=""><span><strong>Alex</strong><em>Automation Architect</em></span><span class="cc-online">Online</span></li>
+            <li><img src="assets/avatars/brianna.png" alt=""><span><strong>Brianna</strong><em>Power Apps Architect</em></span><span class="cc-online">Online</span></li>
+            <li><img src="assets/avatars/bianca.png" alt=""><span><strong>Bianca</strong><em>Portal &amp; Analytics Architect</em></span><span class="cc-online">Online</span></li>
+            <li><img src="assets/avatars/christina.png" alt=""><span><strong>Christina</strong><em>QA &amp; DevOps Director</em></span><span class="cc-online">Online</span></li>
+            <li><img src="assets/avatars/kaira.png" alt=""><span><strong>Kaira</strong><em>Security &amp; Governance Director</em></span><span class="cc-online">Online</span></li>
+            <li><img src="assets/avatars/miakkcar.png" alt=""><span><strong>MiaKkcar</strong><em>Product &amp; CX Director</em></span><span class="cc-online">Online</span></li>
+            <li><img src="assets/avatars/zeruiah.png" alt=""><span><strong>Zeruiah</strong><em>Manager &amp; Executive Producer</em></span><span class="cc-online">Online</span></li>
+            <li><img src="assets/avatars/don-colion.png" alt=""><span><strong>Don Colion</strong><em>Music Producer</em></span><span class="cc-online">Online</span></li>
+          </ul>
+        </section>
+
+        <!-- Center: workload + performance -->
+        <section class="cc-card">
+          <header class="cc-card-head"><h2>Agent workload</h2><span class="cc-sub">last 24h</span></header>
+          <ul class="cc-bars" id="ccWorkload">
+            <li><span>Lucy</span><div class="cc-bar"><i style="width:100%"></i></div><b>100%</b></li>
+            <li><span>Christina</span><div class="cc-bar"><i style="width:95%"></i></div><b>95%</b></li>
+            <li><span>Kaira</span><div class="cc-bar"><i style="width:92%"></i></div><b>92%</b></li>
+            <li><span>Alex</span><div class="cc-bar"><i style="width:90%"></i></div><b>90%</b></li>
+            <li><span>JABBNETWORKS</span><div class="cc-bar"><i style="width:88%"></i></div><b>88%</b></li>
+            <li><span>Ryan</span><div class="cc-bar"><i style="width:87%"></i></div><b>87%</b></li>
+            <li><span>Bianca</span><div class="cc-bar"><i style="width:80%"></i></div><b>80%</b></li>
+            <li><span>Julian</span><div class="cc-bar"><i style="width:85%"></i></div><b>85%</b></li>
+            <li><span>Brianna</span><div class="cc-bar"><i style="width:75%"></i></div><b>75%</b></li>
+            <li><span>MiaKkcar</span><div class="cc-bar"><i style="width:70%"></i></div><b>70%</b></li>
+          </ul>
+          <header class="cc-card-head" style="margin-top:22px;"><h2>System performance</h2></header>
+          <div class="cc-gauges" id="ccGauges">
+            <div class="cc-gauge" id="gCpu" style="--v:36;--c:#22d3ee"><span>36%</span><em>CPU</em></div>
+            <div class="cc-gauge" id="gMemory" style="--v:62;--c:#7c5cff"><span>62%</span><em>Memory</em></div>
+            <div class="cc-gauge" id="gStorage" style="--v:41;--c:#43e08a"><span>41%</span><em>Storage</em></div>
+            <div class="cc-gauge" id="gLoad" style="--v:78;--c:#f59e0b"><span>78%</span><em>Load</em></div>
+          </div>
+        </section>
+
+        <!-- Right: health + timeline + voice -->
+        <section class="cc-card">
+          <header class="cc-card-head"><h2>Project health</h2><span class="cc-sub">12 projects</span></header>
+          <div class="cc-health">
+            <div class="cc-donut" id="ccDonut" style="--ontrack:58%;--atrisk:83%;--delayed:92%"><span id="ccDonutTotal">12</span></div>
+            <ul class="cc-legend" id="ccLegend">
+              <li><i style="background:#43e08a"></i>On track <b>7</b></li>
+              <li><i style="background:#f59e0b"></i>At risk <b>3</b></li>
+              <li><i style="background:#ff6b6b"></i>Delayed <b>1</b></li>
+              <li><i style="background:#22d3ee"></i>Completed <b>1</b></li>
+            </ul>
+          </div>
+
+          <header class="cc-card-head" style="margin-top:18px;"><h2>Activity timeline</h2><span class="cc-sub cc-live-sub">live</span></header>
+          <ul class="cc-timeline" id="ccTimeline">
+            <li><span class="cc-t-time">10:30</span> <b>Alex</b> completed flow "Invoice Approval"</li>
+            <li><span class="cc-t-time">10:28</span> <b>Brianna</b> published Power App "Service Desk"</li>
+            <li><span class="cc-t-time">10:25</span> <b>Ryan</b> refreshed Fabric warehouse "SalesDW"</li>
+            <li><span class="cc-t-time">10:20</span> <b>Christina</b> deployed release to UAT</li>
+            <li><span class="cc-t-time">10:15</span> <b>Kaira</b> completed security scan — 0 findings</li>
+          </ul>
+
+          <div class="cc-voice">
+            <div class="cc-mic" aria-hidden="true">🎙️</div>
+            <div><strong>AI Voice Command</strong><span>Say “Hey Lucy” to get started</span></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Microsoft ecosystem -->
+      <section class="cc-card cc-eco">
+        <header class="cc-card-head"><h2>Microsoft ecosystem integration</h2></header>
+        <ul class="cc-eco-list">
+          <li>⚡ Power Automate</li><li>📱 Power Apps</li><li>📊 Power BI</li><li>🌐 Power Pages</li>
+          <li>🗄️ Dataverse</li><li>📁 SharePoint</li><li>🏢 Microsoft 365</li><li>👥 Teams</li>
+          <li>🧵 Microsoft Fabric</li><li>☁️ Azure</li><li>🐙 GitHub</li><li>🤖 Copilot Studio</li>
+        </ul>
+      </section>
+
+      <p class="cc-note">
+        In <strong>live mode</strong> the KPIs, project health, workload, timeline, and system
+        gauges are real — measured from this backend (projects, tasks, API calls, CPU/memory/storage).
+        AI Tokens are estimated from real automation runs. See agents working live in the
+        <a href="workspace.html">Workspace</a>; run projects in the <a href="aios.html">AIOS room</a>.
+      </p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <p>&copy; <span id="year">2026</span> Lucy AI. All rights reserved.</p>
+      <p class="powered">
+        <img class="jabb-mark" src="assets/brand/jabbnetworks-logo.png" alt="JABB Networks" />
+        Powered by <a href="https://jabbnetworks.com" target="_blank" rel="noopener noreferrer">JABB&nbsp;Networks</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Runtime config (served by the backend in live mode; 404 -> concept data). -->
+  <script src="aios-config.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/command-center.js" defer></script>
+</body>
+</html>

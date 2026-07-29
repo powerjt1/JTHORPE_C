@@ -17,6 +17,10 @@ var config = cfg.config;
 var authRoutes = require("./routes/auth");
 var emailRoutes = require("./routes/email");
 var projectRoutes = require("./routes/projects");
+var dashboardRoutes = require("./routes/dashboard");
+var agentRoutes = require("./routes/agents");
+var metrics = require("./src/metrics");
+var security = require("./src/security");
 
 if (!config.cookieSecret) {
   // Fail fast: signed cookies are required for state/PKCE and the session.
@@ -25,11 +29,21 @@ if (!config.cookieSecret) {
   process.exit(1);
 }
 
+// Production guardrails: warn (dev) or refuse to boot (production) on weak config.
+var audit = security.auditProduction();
+audit.warnings.forEach(function (w) { console.warn("WARN [security]", w); }); // eslint-disable-line no-console
+if (audit.fatals.length) {
+  audit.fatals.forEach(function (f) { console.error("FATAL [security]", f); }); // eslint-disable-line no-console
+  process.exit(1);
+}
+
 var app = express();
 app.disable("x-powered-by");
+if (config.trustProxy) app.set("trust proxy", 1);
+app.use(security.securityHeaders);
 app.use(cookieParser(config.cookieSecret));
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: false, limit: "32kb" }));
+app.use(express.json({ limit: "32kb" }));
 
 // Minimal CORS — only needed if the site is served from a different origin and
 // calls the email endpoints via fetch. Allows credentials for the one origin.
@@ -48,8 +62,14 @@ if (config.allowedOrigin) {
 
 // Health check
 app.get("/healthz", function (req, res) {
+  var store = { kind: config.accountsStore, ok: true };
+  if (config.accountsStore === "sqlite") {
+    try { require("./src/sqlite")._db().prepare("SELECT 1 AS ok").get(); }
+    catch (e) { store.ok = false; store.error = "sqlite unavailable"; }
+  }
   res.json({
-    ok: true,
+    ok: store.ok,
+    store: store,
     providers: {
       microsoft: cfg.isProviderConfigured("microsoft"),
       google: cfg.isProviderConfigured("google")
@@ -58,10 +78,23 @@ app.get("/healthz", function (req, res) {
   });
 });
 
-// OAuth + email + projects
-app.use("/auth", authRoutes);
-app.use("/email", emailRoutes);
+// Count real API calls (the app endpoints, not static assets).
+app.use(function (req, res, next) {
+  if (/^\/(auth|email|projects|dashboard|agents)\b/.test(req.path)) metrics.recordApiCall();
+  next();
+});
+
+// Rate limits on abuse-prone endpoints (per client IP, fixed window).
+var authLimit = security.rateLimiter({ windowMs: 60000, max: 30, key: "auth" });
+var emailLimit = security.rateLimiter({ windowMs: 60000, max: 10, key: "email" });
+var askLimit = security.rateLimiter({ windowMs: 60000, max: 20, key: "agents" });
+
+// OAuth + email + projects + agents
+app.use("/auth", authLimit, authRoutes);
+app.use("/email", emailLimit, emailRoutes);
 app.use("/projects", projectRoutes);
+app.use("/dashboard", dashboardRoutes);
+app.use("/agents", askLimit, agentRoutes);
 
 // Optionally serve the static marketing site from the repo root.
 if (process.env.SERVE_STATIC === "true") {

@@ -1,6 +1,7 @@
 # Lucy AI — app image: Node backend that also serves the static site
 # (same origin, so cookies + fetch work without CORS).
-FROM node:20-alpine
+# Node 22 (>= 22.5) so the built-in node:sqlite store is available.
+FROM node:22-alpine
 
 WORKDIR /app
 
@@ -12,7 +13,9 @@ RUN cd backend && npm ci --omit=dev
 COPY backend ./backend
 
 # Static site (served by the backend via SERVE_STATIC -> path.resolve(__dirname, "..")).
-COPY index.html team.html aios.html signup.html welcome.html projects.html ./
+# Copy every root page so new pages (workspace, assembly, city, command-center…)
+# ship automatically.
+COPY *.html ./
 COPY css ./css
 COPY js ./js
 COPY assets ./assets

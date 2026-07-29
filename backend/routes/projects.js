@@ -18,19 +18,22 @@ var router = express.Router();
 var crypto = require("crypto");
 
 var projects = require("../src/projects");
+var metrics = require("../src/metrics");
 
 var SESSION_COOKIE = "lucy_session";
 
 // The orchestration script: one task per specialist, in order.
 var PHASES = [
-  { agent: "lucy",     name: "Orchestration",         active: "Briefing the team and planning the work.",        done: "Plan set. Team briefed." },
-  { agent: "julian",   name: "Architecture",          active: "Designing the architecture and environments.",     done: "Architecture approved." },
-  { agent: "jabb",     name: "Environment setup",     active: "Provisioning environments and connections.",       done: "Environments provisioned." },
-  { agent: "alex",     name: "Automation & RPA",      active: "Building the automations and flows.",              done: "Flows built and passing." },
-  { agent: "brianna",  name: "App development",       active: "Building the app and its screens.",                done: "App built and published." },
-  { agent: "bianca",   name: "Dashboards & portals",  active: "Creating dashboards and the client portal.",       done: "Dashboards and portal live." },
-  { agent: "phoenix",  name: "QA & release",          active: "Running tests and preparing the release.",         done: "Tests green. Release staged." },
-  { agent: "sentinel", name: "Security & compliance", active: "Scanning for threats and validating compliance.",  done: "Security validated. Compliant." }
+  { agent: "lucy",      name: "Orchestration",         active: "Briefing the team and planning the work.",        done: "Plan set. Team briefed." },
+  { agent: "julian",    name: "Architecture",          active: "Designing the architecture and environments.",     done: "Architecture approved." },
+  { agent: "jabb",      name: "Environment setup",     active: "Provisioning environments and connections.",       done: "Environments provisioned." },
+  { agent: "ryan",      name: "Data & Fabric",         active: "Building the lakehouse and semantic models.",       done: "Data foundation ready." },
+  { agent: "alex",      name: "Automation & RPA",      active: "Building the automations and flows.",              done: "Flows built and passing." },
+  { agent: "brianna",   name: "App development",       active: "Building the app and its screens.",                done: "App built and published." },
+  { agent: "bianca",    name: "Dashboards & portals",  active: "Creating dashboards and the client portal.",       done: "Dashboards and portal live." },
+  { agent: "christina", name: "QA & release",          active: "Running tests and preparing the release.",         done: "Tests green. Release staged." },
+  { agent: "kaira",     name: "Security & compliance", active: "Scanning for threats and validating compliance.",  done: "Security validated. Compliant." },
+  { agent: "miakkcar",  name: "Product & launch",      active: "Polishing the experience and prepping launch.",    done: "Experience polished. Ready to launch." }
 ];
 
 function session(req) {
@@ -63,6 +66,7 @@ router.post("/", async function (req, res) {
         phase: i, phaseName: PHASES[i].name, orderIndex: i, status: "queued", message: ""
       });
     }
+    metrics.recordProjectCreated();
     var full = await projects.getProject(id);
     return res.json({ ok: true, project: full });
   } catch (e) {
@@ -95,13 +99,15 @@ router.post("/:id/tick", async function (req, res) {
   if (!requireOwner(req, res, project)) return;
 
   try {
+    metrics.recordAutomationRun();
+    var nowTs = new Date().toISOString();
     var active = project.tasks.find(function (t) { return t.status === "active"; });
     if (active) {
-      await projects.updateTask(active.id, { status: "done", message: PHASES[active.phase].done });
+      await projects.updateTask(active.id, { status: "done", message: PHASES[active.phase].done, updatedAt: nowTs });
     }
     var next = project.tasks.find(function (t) { return t.status === "queued"; });
     if (next) {
-      await projects.updateTask(next.id, { status: "active", message: PHASES[next.phase].active });
+      await projects.updateTask(next.id, { status: "active", message: PHASES[next.phase].active, updatedAt: nowTs });
     }
 
     var refreshed = await projects.getProject(req.params.id);

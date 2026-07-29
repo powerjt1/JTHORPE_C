@@ -96,7 +96,9 @@ var remote = {
 // Facade
 // ---------------------------------------------------------------------------
 function backend() {
-  return config.accountsStore === "remote" ? remote : memory;
+  if (config.accountsStore === "remote") return remote;
+  if (config.accountsStore === "sqlite") return require("./sqlite").accounts;
+  return memory;
 }
 
 module.exports = {

@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "node test/auth.test.js && node test/email.test.js && node test/verify.test.js && node test/projects.test.js",
+    "test": "node test/auth.test.js && node test/email.test.js && node test/verify.test.js && node test/projects.test.js && node test/agents.test.js && node test/security.test.js && node test/sqlite.test.js",
     "test:remote": "node test/projects.test.js"
   },
   "engines": {
