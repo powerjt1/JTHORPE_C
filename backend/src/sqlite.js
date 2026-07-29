@@ -19,7 +19,15 @@ var config = require("./config").config;
 var _db = null;
 function db() {
   if (_db) return _db;
-  var DatabaseSync = require("node:sqlite").DatabaseSync;
+  var DatabaseSync;
+  try {
+    DatabaseSync = require("node:sqlite").DatabaseSync;
+  } catch (e) {
+    throw new Error(
+      "ACCOUNTS_STORE=sqlite requires Node's built-in node:sqlite (Node >= 22.5). " +
+      "Upgrade Node, or use ACCOUNTS_STORE=memory|remote. (" + e.message + ")"
+    );
+  }
   var file = config.sqlitePath || "./data/aios.db";
   if (file !== ":memory:") fs.mkdirSync(path.dirname(path.resolve(file)), { recursive: true });
   _db = new DatabaseSync(file);

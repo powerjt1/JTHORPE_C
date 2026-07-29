@@ -72,8 +72,9 @@ These need your own credentials (see [`docs/auth-setup.md`](docs/auth-setup.md))
 Set `ACCOUNTS_STORE`:
 
 - **`sqlite`** (recommended for single-node) — native `node:sqlite`, persistent,
-  **no extra service**. Set `SQLITE_PATH=/data/aios.db` and mount a volume at
-  `/data`. Survives restarts; `/healthz` reports `store.kind=sqlite`.
+  **no extra service**. Needs **Node ≥ 22.5**. Set `SQLITE_PATH=/data/aios.db` and
+  mount a volume at `/data`. Survives restarts; `/healthz` reports
+  `store.kind=sqlite`. (On older Node, use `memory` or `remote`.)
 - **`remote`** — the separate Python SQLite bridge (`db/`) over the Compose
   network, guarded by `DB_TOKEN` (what `docker-compose.yml` wires today).
 - **`memory`** — dev only; resets on restart.

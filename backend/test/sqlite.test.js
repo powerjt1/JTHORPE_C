@@ -1,5 +1,14 @@
 "use strict";
 // Native SQLite store: accounts + projects round-trip and real on-disk persistence.
+// Requires Node's built-in node:sqlite (Node >= 22.5). On older runtimes this
+// suite skips (the sqlite store simply isn't used there) instead of failing.
+try {
+  require("node:sqlite");
+} catch (e) {
+  console.log("SKIP sqlite tests — node:sqlite unavailable (needs Node >= 22.5): " + e.message);
+  process.exit(0);
+}
+
 var os = require("os");
 var path = require("path");
 var fs = require("fs");
