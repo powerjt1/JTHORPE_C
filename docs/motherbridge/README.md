@@ -106,7 +106,7 @@ Music Producer — extend the core team.)
 [Plugin SDK](./specs/PLUGIN-SDK-SPEC.md) ✅ ·
 [API Standards](./specs/API-STANDARDS.md) ✅ ·
 [Coding Standards](./specs/CODING-STANDARDS.md) ✅ ·
-Enterprise Development Standards.
+[Enterprise Development Standards](./specs/ENTERPRISE-DEV-STANDARDS.md) ✅.
 
 The kernel is implemented in **Python**; a reference package lives in
 [`/kernel`](../../kernel/) and already loads these prompt files.
