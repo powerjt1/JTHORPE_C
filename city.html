@@ -214,6 +214,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
   </div>
 </div>
 
+<script src="aios-config.js"></script>
 <script src="assets/vendor/three.min.js"></script>
 <script>
 /* ============ AGENT DISTRICTS (the 12-agent AIOS roster) ============ */
@@ -414,11 +415,24 @@ LINKS.forEach(([a,b])=>{
   wires.push({a,b,curve,line,fault});
 });
 
+/* ============ LIVE DATA (optional overlay) ============ */
+const CONFIG=Object.assign({authBaseUrl:"",backendEnabled:false},window.AIOS_CONFIG||{});
+const AV2ID={}; D.forEach(d=>AV2ID[d.av]=d.id);
+const LIVE={on:false,byId:{},kpis:null};
+function engagedIds(){return Object.keys(LIVE.byId).filter(id=>LIVE.byId[id]&&LIVE.byId[id].pct>0);}
+
 /* ============ PACKETS ============ */
 const pGeo=new THREE.SphereGeometry(.62,10,10);
 const packets=[];
 function fire(){
-  const w=wires[Math.floor(Math.random()*wires.length)];
+  let w;
+  const eng=LIVE.on?engagedIds():[];
+  if(eng.length&&Math.random()<.6){                 // bias traffic toward agents doing real work
+    const hot=wires.filter(x=>eng.includes(x.a)||eng.includes(x.b));
+    w=hot.length?hot[Math.floor(Math.random()*hot.length)]:wires[Math.floor(Math.random()*wires.length)];
+  } else {
+    w=wires[Math.floor(Math.random()*wires.length)];
+  }
   const bad=w.fault&&Math.random()<.45;
   const flip=Math.random()<.5;
   const from=flip?w.a:w.b, to=flip?w.b:w.a;
@@ -503,7 +517,12 @@ function paintPanel(){
     return `<li class="${cls}">${s}${i===d.now?' <span style="color:var(--amber2)">— in progress</span>':''}</li>`;
   }).join('');
   const routes=LINKS.filter(l=>l[0]===d.id||l[1]===d.id).length;
-  document.getElementById('pVitals').innerHTML=`
+  const lr=LIVE.on?LIVE.byId[d.id]:null;
+  const liveRows=lr?`
+    <div class="kv"><span>Status <span style="color:var(--live)">● live</span></span><span style="color:${lr.online?'var(--live)':'var(--dim)'}">${lr.online?'Online':'Offline'}</span></div>
+    <div class="kv"><span>Workload 24h</span><span>${lr.pct}%</span></div>
+    ${lr.msg?`<div class="kv"><span>Latest</span><span style="max-width:190px;text-align:right;white-space:normal">${lr.msg.replace(/[<>]/g,'')}</span></div>`:''}`:'';
+  document.getElementById('pVitals').innerHTML=liveRows+`
     <div class="kv"><span>Sub-agents on shift</span><span>${d.agents}</span></div>
     <div class="kv"><span>Routes</span><span>${routes}</span></div>
     <div class="kv"><span>Runs today</span><span>${d.runs.toLocaleString()}</span></div>
@@ -542,6 +561,8 @@ function loop(ts){
   applyCam();
   towers.forEach(t=>{
     t.pulse=Math.max(0,t.pulse-.022*dt);
+    const lr=LIVE.on?LIVE.byId[t.d.id]:null;         // engaged agents keep a steady glow
+    if(lr&&lr.pct>0) t.pulse=Math.max(t.pulse,.28);
     t.bea.scale.setScalar(1+t.pulse*.55);
     t.halo.material.opacity=.32+t.pulse*.5;
     const dim=selected&&selected!==t.d.id
@@ -573,6 +594,31 @@ addEventListener('resize',()=>{
   renderer.setSize(innerWidth,innerHeight);
 });
 
+/* ============ LIVE DATA FETCH ============ */
+function liveLog(agent,msg){
+  const ul=document.getElementById('logList');const li=document.createElement('li');
+  const id=AV2ID[agent]||String(agent).toUpperCase();
+  li.innerHTML=`<span class="t">${new Date().toTimeString().slice(0,8)}</span>`+
+    `<span class="r"><i>${id}</i> ${String(msg||'').replace(/[<>]/g,'')}</span>`;
+  ul.prepend(li);while(ul.children.length>6)ul.lastChild.remove();
+}
+function applyLive(data){
+  if(!data||!data.ok) return;
+  LIVE.on=true; LIVE.kpis=data.kpis;
+  const wl={}; (data.workload||[]).forEach(w=>wl[w.agent]=w.pct);
+  const on={}; (data.agents||[]).forEach(a=>on[a.id]=a.online!==false);
+  const msg={}; (data.timeline||[]).forEach(t=>{ if(!msg[t.agent]) msg[t.agent]=t.message; });
+  D.forEach(d=>{ LIVE.byId[d.id]={pct:wl[d.av]||0,online:on[d.av]!==false,msg:msg[d.av]||null}; });
+  const tag=document.querySelector('.tag'); if(tag) tag.textContent='Agent City · AIOS HQ · LIVE DATA';
+  (data.timeline||[]).slice(0,3).reverse().forEach(t=>liveLog(t.agent,t.message));
+  if(selected) paintPanel();
+}
+function fetchLive(){
+  if(!CONFIG.backendEnabled) return;
+  const base=(CONFIG.authBaseUrl||'').replace(/\/$/,'');
+  fetch(base+'/dashboard',{credentials:'include'}).then(r=>r.ok?r.json():null).then(applyLive).catch(()=>{});
+}
+
 /* ============ BOOT ============ */
 document.getElementById('mD').textContent=D.length;
 document.getElementById('mA').textContent=D.reduce((s,d)=>s+d.agents,0);
@@ -581,6 +627,7 @@ paintIndex();
 setInterval(()=>{if(packets.length<70)fire()},330);
 requestAnimationFrame(loop);
 setTimeout(()=>document.getElementById('loading').classList.add('gone'),700);
+fetchLive(); setInterval(fetchLive,8000);   // live overlay when a backend is serving the site
 </script>
 </body>
 </html>
