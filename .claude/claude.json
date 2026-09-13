@@ -10,6 +10,16 @@
         "LIVEKIT_API_KEY": "${LIVEKIT_API_KEY}",
         "LIVEKIT_API_SECRET": "${LIVEKIT_API_SECRET}"
       }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@anthropic-ai/playwright-mcp"
+      ],
+      "env": {
+        "PLAYWRIGHT_HEADLESS": "true",
+        "PLAYWRIGHT_BROWSER_TYPE": "chromium"
+      }
     }
   }
 }
