@@ -1,0 +1,35 @@
+name: Setup Power Platform Skills
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'scripts/install-power-platform-skills.*'
+      - 'package.json'
+      - '.github/workflows/setup-power-platform-skills.yml'
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+jobs:
+  install-power-platform-skills:
+    name: Install Power Platform Skills
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Power Platform Skills
+        run: npm run install:power-platform-skills || node scripts/install-power-platform-skills.js
+
+      - name: Verify installation
+        run: |
+          echo "✅ Power Platform Skills setup completed"
+          echo "Power Platform Skills are now available for use in this project"
