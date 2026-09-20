@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "OAuth (Microsoft + Google) sign-in backend for the Lucy AI free-trial sign-up. Scaffold — deploy with real credentials.",
+  "author": "JABBNETWORKS",
   "type": "commonjs",
   "main": "server.js",
   "scripts": {
