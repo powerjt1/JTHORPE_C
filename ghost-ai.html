@@ -1015,22 +1015,21 @@ function iconBadge(key, size){
 }
 
 // ================= API CALL =================
-async function callClaude(systemPrompt, userMessage, conversationHistory, model){
-  const messages = (conversationHistory||[]).map(m => ({role:m.role, content:m.content}));
-  messages.push({role:"user", content:userMessage});
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+// Cloud replies go through this app's own backend (POST /ghost-agents/:id/ask),
+// which holds the real Anthropic key server-side (backend/src/llm.js) — the
+// browser never sees it. Falls back to a deterministic in-character reply
+// when the backend has no key configured, or isn't running at all.
+async function callClaude(agentKey, userMessage, conversationHistory){
+  const history = (conversationHistory||[]).map(m => ({role:m.role, content:m.content}));
+  const response = await fetch(`/ghost-agents/${agentKey}/ask`, {
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      model: model || "claude-sonnet-4-6",
-      max_tokens:1000,
-      system: systemPrompt,
-      messages: messages
-    })
+    body: JSON.stringify({ question: userMessage, history, systemPrompt: getAgentSystem(agentKey) })
   });
+  if(!response.ok) throw new Error("backend responded " + response.status);
   const data = await response.json();
-  const blocks = (data.content||[]).filter(b => b.type==="text").map(b => b.text);
-  return blocks.join("\\n") || "(no response)";
+  if(!data.ok) throw new Error(data.error || "backend error");
+  return data.answer || "(no response)";
 }
 
 async function callLocalLLM(endpoint, model, systemPrompt, userMessage, conversationHistory){
@@ -1049,13 +1048,15 @@ async function callLocalLLM(endpoint, model, systemPrompt, userMessage, conversa
   return (data.message && data.message.content) || "(no response)";
 }
 
-// Routes a call to whichever provider (Claude Cloud or local Ollama-compatible server) is configured for this agent.
+// Routes a call to whichever provider is configured for this agent:
+// Cloud -> this app's backend (real Claude, key stays server-side);
+// Local -> directly to the user's own local Ollama-compatible server.
 async function callAgent(key, userMessage, conversationHistory){
-  const systemPrompt = getAgentSystem(key);
   if(getAgentProvider(key) === "local"){
+    const systemPrompt = getAgentSystem(key);
     return callLocalLLM(getAgentLocalEndpoint(key), getAgentLocalModel(key), systemPrompt, userMessage, conversationHistory);
   }
-  return callClaude(systemPrompt, userMessage, conversationHistory, getAgentModel(key));
+  return callClaude(key, userMessage, conversationHistory);
 }
 
 // ================= LOGGING =================

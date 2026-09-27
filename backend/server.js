@@ -19,6 +19,7 @@ var emailRoutes = require("./routes/email");
 var projectRoutes = require("./routes/projects");
 var dashboardRoutes = require("./routes/dashboard");
 var agentRoutes = require("./routes/agents");
+var ghostRoutes = require("./routes/ghost");
 var metrics = require("./src/metrics");
 var security = require("./src/security");
 
@@ -80,7 +81,7 @@ app.get("/healthz", function (req, res) {
 
 // Count real API calls (the app endpoints, not static assets).
 app.use(function (req, res, next) {
-  if (/^\/(auth|email|projects|dashboard|agents)\b/.test(req.path)) metrics.recordApiCall();
+  if (/^\/(auth|email|projects|dashboard|agents|ghost-agents)\b/.test(req.path)) metrics.recordApiCall();
   next();
 });
 
@@ -88,6 +89,7 @@ app.use(function (req, res, next) {
 var authLimit = security.rateLimiter({ windowMs: 60000, max: 30, key: "auth" });
 var emailLimit = security.rateLimiter({ windowMs: 60000, max: 10, key: "email" });
 var askLimit = security.rateLimiter({ windowMs: 60000, max: 20, key: "agents" });
+var ghostAskLimit = security.rateLimiter({ windowMs: 60000, max: 20, key: "ghost-agents" });
 
 // OAuth + email + projects + agents
 app.use("/auth", authLimit, authRoutes);
@@ -95,6 +97,7 @@ app.use("/email", emailLimit, emailRoutes);
 app.use("/projects", projectRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/agents", askLimit, agentRoutes);
+app.use("/ghost-agents", ghostAskLimit, ghostRoutes);
 
 // Optionally serve the static marketing site from the repo root.
 if (process.env.SERVE_STATIC === "true") {

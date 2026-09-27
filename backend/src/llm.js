@@ -27,14 +27,21 @@ function model() {
 
 /**
  * Call the Anthropic Messages API. Resolves { text, model } or rejects on error.
+ * `history` is an optional array of prior { role: "user"|"assistant", content } turns,
+ * sent ahead of the new user message so multi-turn chats keep context.
  */
-async function complete(system, user, maxTokens) {
+async function complete(system, user, maxTokens, history) {
   var key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("ANTHROPIC_API_KEY is not set");
 
   var base = (process.env.ANTHROPIC_BASE_URL || DEFAULT_BASE).replace(/\/$/, "");
   var controller = new AbortController();
   var timer = setTimeout(function () { controller.abort(); }, TIMEOUT_MS);
+
+  var messages = (Array.isArray(history) ? history : [])
+    .filter(function (m) { return m && (m.role === "user" || m.role === "assistant") && m.content; })
+    .map(function (m) { return { role: m.role, content: String(m.content) }; });
+  messages.push({ role: "user", content: user });
 
   try {
     var res = await fetch(base + "/v1/messages", {
@@ -48,7 +55,7 @@ async function complete(system, user, maxTokens) {
         model: model(),
         max_tokens: maxTokens || 400,
         system: system,
-        messages: [{ role: "user", content: user }]
+        messages: messages
       }),
       signal: controller.signal
     });
